@@ -8,16 +8,16 @@ import computer from "../assets/computer.png";
 import cat from "../assets/cat.png";
 
 const icons = [
-  { src: computer, alt: "computer icon", style: "top-[20px] left-[40px]" },
-  { src: abc, alt: "abc icon", style: "top-[24px] left-[160px]" },
-  { src: globe, alt: "globe icon", style: "top-[220px] left-[36px]" },
-  { src: shape1, alt: "shape1 icon", style: "bottom-[80px] left-[150px]" },
-  { src: globe, alt: "globe icon", style: "bottom-[40px] right-[50px]" },
-  { src: computer, alt: "computer icon", style: "bottom-[100px] right-[20px]" },
-  { src: shape2, alt: "shape2 icon", style: "top-[30px] right-[40px]" },
-  { src: abc, alt: "abc icon", style: "bottom-[140px] left-[60px]" },
-  { src: shape3, alt: "shape3 icon", style: "top-[200px] right-[60px]" },
-  { src: cat, alt: "cat icon", style: "bottom-[50px] right-[200px]" },
+  { src: computer, alt: "computer icon", style: "top-[10%] left-[10%]", size: 40 },
+  { src: abc, alt: "abc icon", style: "top-[15%] left-[30%]", size: 32 },
+  { src: globe, alt: "globe icon", style: "top-[40%] left-[10%]" },
+  { src: shape1, alt: "shape1 icon", style: "bottom-[15%] left-[30%]" },
+  { src: globe, alt: "globe icon", style: "bottom-[10%] right-[10%]" },
+  { src: computer, alt: "computer icon", style: "bottom-[20%] right-[5%]" },
+  { src: shape2, alt: "shape2 icon", style: "top-[10%] right-[10%]" },
+  { src: abc, alt: "abc icon", style: "bottom-[25%] left-[15%]" },
+  { src: shape3, alt: "shape3 icon", style: "top-[35%] right-[15%]" },
+  { src: cat, alt: "cat icon", style: "bottom-[10%] right-[40%]" },
 ];
 
 const squiggles = [
@@ -31,12 +31,13 @@ export default function BackgroundPattern() {
   return (
     <div className="relative w-full h-screen bg-[#FCEEED] overflow-hidden">
       {/* Background Icons */}
-      {icons.map((icon, index) => (
+      {icons.map((icon, idx) => (
         <img
-          key={index}
+          key={idx}
           src={icon.src}
           alt={icon.alt}
-          className={`absolute opacity-30 w-10 h-10 ${icon.style}`}
+          className={`absolute ${icon.style}`}
+          style={{ width: icon.size, height: icon.size }}
         />
       ))}
 
