@@ -12,13 +12,13 @@ const Navbar = () => {
       {/* Navigation Links */}
       <div className="flex gap-8">
         <a
-          href="#home"
+          href="/"
           className="text-gray-800 text-lg font-medium hover:text-blue-500 transition duration-300 ease-in-out transform hover:scale-105"
         >
           Beranda
         </a>
         <a
-          href="#collection"
+          href="/koleksi"
           className="text-gray-800 text-lg font-medium hover:text-blue-500 transition duration-300 ease-in-out transform hover:scale-105"
         >
           Koleksi
