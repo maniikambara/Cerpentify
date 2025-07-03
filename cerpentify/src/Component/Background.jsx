@@ -29,7 +29,7 @@ const squiggles = [
 
 export default function BackgroundPattern() {
   return (
-    <div className="relative w-full h-screen bg-[#FCEEED] overflow-hidden">
+    <div className="fixed inset-0 w-full min-h-screen bg-[#FCEEED] overflow-hidden -z-10">
       {/* Background Icons */}
       {icons.map((icon, idx) => (
         <img
