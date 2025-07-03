@@ -2,7 +2,10 @@ import React from "react";
 
 export default function CardWhite() {
   return (
-    <div className="max-w-sm p-6 bg-white rounded-2xl shadow-md space-y-4">
+    <div
+      className="max-w-sm p-6 bg-white rounded-2xl shadow-md space-y-4 cursor-pointer transition-transform duration-200 hover:shadow-xl hover:scale-105 active:scale-95"
+      onClick={() => alert('Card diklik!')}
+    >
       {/* Judul */}
       <h2 className="text-xl font-semibold text-gray-800">cerpen 3</h2>
 
