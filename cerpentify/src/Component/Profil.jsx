@@ -1,17 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../firebase/authContext.jsx';
 
 const Profil = ({ onClose }) => {
+  const { currentUser, userProfile, updateUserProfile, updateUserPassword, logout } = useAuth();
   const [formData, setFormData] = useState({
-    fullName: 'Manik Ganteng Banget',
-    username: 'username_aja',
-    email: 'manikmanikmanik@yois.co.id',
-    password: '************************',
+    fullName: '',
+    username: '',
+    email: '',
+    password: '',
     age: 18
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (userProfile) {
+      setFormData({
+        fullName: userProfile.fullName || '',
+        username: userProfile.username || '',
+        email: userProfile.email || '',
+        password: '',
+        age: userProfile.age || 18
+      });
+    }
+  }, [userProfile]);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -27,22 +43,72 @@ const Profil = ({ onClose }) => {
     }));
   };
 
-  const handleSave = () => {
-    setShowSuccess(true);
-    setTimeout(() => {
-      setShowSuccess(false);
-      // Do not close panel on save
-    }, 2000);
+  const handleSave = async () => {
+    try {
+      setError('');
+      setLoading(true);
+      
+      // Update profile data
+      await updateUserProfile(currentUser.uid, {
+        fullName: formData.fullName,
+        username: formData.username,
+        email: formData.email,
+        age: formData.age
+      });
+      
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 3000);
+      
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setError('Gagal menyimpan perubahan. Silakan coba lagi.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleLogout = () => {
-    navigate('/login');
+  const handlePasswordChange = async () => {
+    if (!formData.password) {
+      setError('Password tidak boleh kosong');
+      return;
+    }
+    
+    if (formData.password.length < 6) {
+      setError('Password minimal 6 karakter');
+      return;
+    }
+
+    try {
+      setError('');
+      setLoading(true);
+      await updateUserPassword(formData.password);
+      setFormData(prev => ({ ...prev, password: '' }));
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error('Error updating password:', error);
+      setError('Gagal mengubah password. Silakan coba lagi.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   };
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-3xl shadow-2xl p-8 border border-gray-100 relative max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors"
@@ -51,52 +117,91 @@ const Profil = ({ onClose }) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-
+        
         <h2 className="text-2xl font-bold text-gray-800 mb-8">Pengaturan Profil</h2>
-
+        
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
+        
+        {showSuccess && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-green-600 text-sm">Profil berhasil diperbarui!</p>
+          </div>
+        )}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Nama Lengkap */}
           <div>
             <label className="block text-gray-700 font-medium mb-3">Nama Lengkap</label>
             <input
               type="text"
               value={formData.fullName}
               onChange={(e) => handleInputChange('fullName', e.target.value)}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              placeholder="Masukkan nama lengkap"
             />
           </div>
-
-          {/* Username */}
+          
           <div>
             <label className="block text-gray-700 font-medium mb-3">Username</label>
             <input
               type="text"
               value={formData.username}
               onChange={(e) => handleInputChange('username', e.target.value)}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              placeholder="Masukkan username"
             />
           </div>
-
-          {/* Email */}
+          
           <div>
             <label className="block text-gray-700 font-medium mb-3">Email</label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              placeholder="Masukkan email"
             />
           </div>
-
-          {/* Password */}
+          
           <div>
-            <label className="block text-gray-700 font-medium mb-3">Password</label>
+            <label className="block text-gray-700 font-medium mb-3">Umur</label>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => handleAgeChange(false)}
+                className="w-10 h-10 bg-purple-500 hover:bg-purple-600 text-white rounded-full flex items-center justify-center transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                </svg>
+              </button>
+              <div className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-center font-medium">
+                {formData.age} tahun
+              </div>
+              <button
+                type="button"
+                onClick={() => handleAgeChange(true)}
+                className="w-10 h-10 bg-purple-500 hover:bg-purple-600 text-white rounded-full flex items-center justify-center transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <div className="md:col-span-2">
+            <label className="block text-gray-700 font-medium mb-3">Password Baru</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                className="w-full pr-10 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                placeholder="Masukkan password baru (kosongkan jika tidak ingin mengubah)"
               />
               <button
                 type="button"
@@ -117,59 +222,33 @@ const Profil = ({ onClose }) => {
               </button>
             </div>
           </div>
-
-          {/* Umur */}
-          <div className="md:col-span-2">
-            <label className="block text-gray-700 font-medium mb-3">Umur</label>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => handleAgeChange(true)}
-                className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition-colors"
-              >
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                </svg>
-              </button>
-              <span className="text-xl font-medium text-gray-800 min-w-[60px] text-center">
-                {formData.age}
-              </span>
-              <button
-                onClick={() => handleAgeChange(false)}
-                className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition-colors"
-              >
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            </div>
-          </div>
         </div>
-
-        {/* Action Buttons */}
+        
         <div className="flex gap-4 mt-8">
-          <button className="px-6 py-3 bg-white border-2 border-purple-200 text-purple-600 rounded-full font-medium hover:bg-purple-50 transition-colors">
-            Ubah Password
-          </button>
-          <button
-            onClick={handleLogout}
-            className="px-6 py-3 bg-white border-2 border-pink-200 text-pink-600 rounded-full font-medium hover:bg-pink-50 transition-colors">
-            Keluar
-          </button>
-        </div>
-
-        {/* Save and Success */}
-        <div className="mt-8 flex items-center gap-4">
           <button
             onClick={handleSave}
-            className="px-8 py-4 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-2xl font-medium transition-all transform hover:scale-105 active:scale-95"
+            disabled={loading}
+            className="flex-1 bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Simpan Perubahan
+            {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
           </button>
-          {showSuccess && (
-            <span className="text-green-800 font-medium">
-              Perubahan Berhasil!
-            </span>
+          
+          {formData.password && (
+            <button
+              onClick={handlePasswordChange}
+              disabled={loading}
+              className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Mengubah Password...' : 'Ubah Password'}
+            </button>
           )}
+          
+          <button
+            onClick={handleLogout}
+            className="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-medium transition-colors"
+          >
+            Logout
+          </button>
         </div>
       </div>
     </div>
