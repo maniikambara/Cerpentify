@@ -1,12 +1,12 @@
 import React from "react";
-import BackgroundDashboard from "../Component/BgLanding.jsx";
+import BackgroundPattern from "../Component/Background.jsx";
 import Navbar from "../Component/Navbar.jsx";
 import CardWhite from "../Component/Whitecard.jsx";
 
 export default function Dashboard() {
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
-      <div className="fixed"><BackgroundDashboard /></div>
+      <div className="fixed"><BackgroundPattern /></div>
       <div style={{ position: "fixed", top: 0, left: 0, width: "100%", zIndex: 100 }}>
         <Navbar />
       </div>
