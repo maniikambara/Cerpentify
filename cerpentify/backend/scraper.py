@@ -123,21 +123,21 @@ class CerpenScraper:
                 cerpen_data['title'] = title_element.get_text().strip()
             
             # Get author
-            author_text = soup.find(text=re.compile(r'Cerpen Karangan:'))
+            author_text = soup.find(string=re.compile(r'Cerpen Karangan:'))
             if author_text:
                 author_link = author_text.find_next('a')
                 if author_link:
                     cerpen_data['author'] = author_link.get_text().strip()
             
             # Get category
-            category_text = soup.find(text=re.compile(r'Kategori:'))
+            category_text = soup.find(string=re.compile(r'Kategori:'))
             if category_text:
                 category_link = category_text.find_next('a', rel=re.compile(r'category tag'))
                 if category_link:
                     cerpen_data['category'] = category_link.get_text().strip()
             
             # Get publication date
-            date_text = soup.find(text=re.compile(r'Lolos moderasi pada:'))
+            date_text = soup.find(string=re.compile(r'Lolos moderasi pada:'))
             if date_text:
                 # Extract date from the next text node
                 date_match = re.search(r'(\d{1,2} \w+ \d{4})', str(date_text.next_sibling))
@@ -156,7 +156,9 @@ class CerpenScraper:
                         'Kamu suka cerpen ini?' in current_element.get_text():
                         break
                         
-                    content_parts.append(current_element.get_text().strip())
+                    paragraph_text = current_element.get_text().strip()
+                    if paragraph_text:
+                        content_parts.append(paragraph_text)
                     current_element = current_element.find_next_sibling('p')
             
             cerpen_data['content'] = '\n\n'.join(content_parts)
@@ -208,7 +210,7 @@ class CerpenScraper:
             if cerpen_data:
                 self.save_cerpen_to_firebase(cerpen_data)
                 
-            time.sleep(2)  # Rate limiting
+            time.sleep(2)
             
         print("Scraping completed!")
 
