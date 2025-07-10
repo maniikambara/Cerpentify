@@ -9,25 +9,23 @@ import { collection, getDocs } from "firebase/firestore";
 export default function Dashboard() {
   const [cerpenList, setCerpenList] = useState([]);
 
-  // Fungsi untuk mengambil data cerpen di Firestore
   const fetchCerpenData = async () => {
     try {
       const cerpenCollection = collection(db, "cerpen");
       const cerpenSnapshot = await getDocs(cerpenCollection);
       const cerpenData = cerpenSnapshot.docs.map((doc) => ({
-        id: doc.id,  // Menambahkan id dokumen ke data
-        ...doc.data(),  // Menambahkan data dokumen
+        id: doc.id,
+        ...doc.data(),
       }));
-      setCerpenList(cerpenData);  // Menyimpan data cerpen beserta id ke state
+      setCerpenList(cerpenData);
     } catch (error) {
       console.error("Error fetching cerpen data:", error);
     }
   };
 
-  // Mengambil data cerpen ketika komponen pertama kali dimuat
   useEffect(() => {
     fetchCerpenData();
-  }, []); // Empty dependency array berarti hanya sekali ketika pertama kali mount
+  }, []);
 
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
@@ -71,8 +69,8 @@ export default function Dashboard() {
             key={rowIdx}
             style={{
               display: "flex",
-              justifyContent: "center", // Untuk menyejajarkan kartu di tengah
-              alignItems: "center", // Untuk menyejajarkan kartu secara vertikal
+              justifyContent: "center",
+              alignItems: "center",
               gap: "50px",
               width: "100%",
             }}
@@ -80,7 +78,7 @@ export default function Dashboard() {
             {cerpenList.slice(rowIdx * 5, rowIdx * 5 + 5).map((cerpen, cardIdx) => (
               <CardWhite
                 key={cardIdx}
-                id={cerpen.id}  // Menyertakan id sebagai prop
+                id={cerpen.id}
                 title={cerpen.title}
                 author={cerpen.author}
                 content={cerpen.content}

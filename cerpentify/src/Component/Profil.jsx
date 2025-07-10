@@ -19,15 +19,16 @@ const Profil = ({ onClose }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (userProfile) {
+    if (currentUser) {
+      // Ambil data dari currentUser dan userProfile setelah login
       setFormData({
-        username: userProfile.username || '',
-        email: userProfile.email || '',
-        password: '',
-        age: userProfile.age || 18
+        username: userProfile?.username || currentUser.displayName || '', // username bisa dari userProfile atau currentUser
+        email: currentUser.email || '', // email langsung dari currentUser
+        password: '', // Password kosong pada awalnya, user bisa mengubahnya jika diinginkan
+        age: userProfile?.age || 18 // Ambil usia dari userProfile atau default 18
       });
     }
-  }, [userProfile]);
+  }, [currentUser, userProfile]); // Pastikan effect dijalankan setiap kali currentUser atau userProfile berubah
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -131,6 +132,12 @@ const Profil = ({ onClose }) => {
           </div>
         )}
         
+        {/* Menambahkan counter Cerpenku dan Koleksiku */}
+        <div className="mb-6">
+          <p className="text-gray-700 font-medium">Cerpenku: {userProfile?.cerpenku?.length || 0}</p>
+          <p className="text-gray-700 font-medium">Koleksiku: {userProfile?.liked_cn?.length || 0}</p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <label className="block text-gray-700 font-medium mb-3">Username</label>

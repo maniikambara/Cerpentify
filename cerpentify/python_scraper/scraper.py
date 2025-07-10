@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import re
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urljoin
 from firebase_config import db
 from datetime import datetime
 
@@ -19,6 +19,7 @@ class CerpenScraper:
         })
         self.category_counter = 1
         self.cerpen_counters = {}  # To track cerpen count per category
+        self.cerpen_id_counter = 1  # Initialize cerpen ID counter
         
     def get_page(self, url):
         """Get page content with error handling"""
@@ -51,7 +52,7 @@ class CerpenScraper:
                 category_url = urljoin(self.base_url, link.get('href'))
                 
                 # Generate category ID
-                category_id = f"CAT{self.category_counter}"
+                category_id = f"kat{self.category_counter}"
                 
                 category_data = {
                     'id': category_id,
@@ -146,7 +147,7 @@ class CerpenScraper:
         soup = self.get_page(cerpen_url)
         if not soup:
             return None
-            
+                
         cerpen_data = {}
         
         try:
@@ -175,7 +176,7 @@ class CerpenScraper:
                 # Extract date from the next text node
                 date_match = re.search(r'(\d{1,2} \w+ \d{4})', str(date_text.next_sibling))
                 if date_match:
-                    cerpen_data['published_date'] = date_match.group(1)
+                    cerpen_data['tanggal_cerpen'] = date_match.group(1)  # Save the publication date as 'tanggal_cerpen'
             
             # Get content
             content_parts = []
@@ -185,25 +186,27 @@ class CerpenScraper:
                 current_element = date_text.find_next('p')
                 while current_element:
                     # Stop if we find the sharing message
-                    if current_element.find('strong') and \
-                        'Kamu suka cerpen ini?' in current_element.get_text():
+                    if current_element.find('strong') and 'Kamu suka cerpen ini?' in current_element.get_text():
                         break
-                        
+                    
                     paragraph_text = current_element.get_text().strip()
                     if paragraph_text:
                         content_parts.append(paragraph_text)
                     current_element = current_element.find_next_sibling('p')
             
-            cerpen_data['content'] = '\n\n'.join(content_parts)
+            # Add newlines between paragraphs to create spacing in the Firebase entry
+            cerpen_data['content'] = '\n\n'.join(content_parts)  # Separate paragraphs with two newlines
+            
             cerpen_data['url'] = cerpen_url
             cerpen_data['scraped_at'] = datetime.now()
             
         except Exception as e:
             print(f"Error scraping cerpen detail: {e}")
             return None
-            
-        return cerpen_data
         
+        return cerpen_data
+
+
     def save_cerpen_to_firebase(self, cerpen_data):
         """Save cerpen data to Firebase"""
         try:
@@ -220,13 +223,17 @@ class CerpenScraper:
                 self.cerpen_counters[category_name] = 0
             self.cerpen_counters[category_name] += 1
             
-            # Generate cerpen ID
-            cerpen_id = f"{category_id}C{self.cerpen_counters[category_name]}"
+            # Generate cerpen ID based on counter
+            cerpen_id = f"cn{self.cerpen_id_counter}"  # Incremental ID format cn1, cn2, ...
+            self.cerpen_id_counter += 1  # Increment the counter for the next cerpen
             
             # Add IDs to cerpen data
             cerpen_data['id'] = cerpen_id
             cerpen_data['category_id'] = category_id
             
+            # Debugging print statement to check cerpen_data before saving
+            print(f"Cerpen Data to save: {cerpen_data}")
+
             # Use cerpen ID as document ID
             self.db.collection('cerpen').document(cerpen_id).set(cerpen_data)
             print(f"Saved cerpen: {cerpen_data['title']} (ID: {cerpen_id})")

@@ -1,36 +1,40 @@
-// Whitecard.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-// Fungsi untuk memotong content menjadi 10-20 kata dan menambahkan '...'
 const getShortContent = (text, minWords = 10, maxWords = 20) => {
   const words = text.split(" ");
   if (words.length <= maxWords) {
-    return text;  // Jika jumlah kata lebih sedikit atau sama dengan maxWords, tampilkan seluruhnya
+    return text;
   }
-  return words.slice(0, Math.max(minWords, maxWords)).join(" ") + "...";  // Potong dan tambahkan '...'
+  return words.slice(0, Math.max(minWords, maxWords)).join(" ") + "...";
 };
 
-// Fungsi untuk memotong title menjadi 2-4 kata dan menambahkan '...'
 const getShortTitle = (title, minWords = 2, maxWords = 3) => {
   const words = title.split(" ");
   if (words.length <= maxWords) {
-    return title;  // Jika jumlah kata lebih sedikit atau sama dengan maxWords, tampilkan seluruhnya
+    return title;
   }
-  return words.slice(0, Math.max(minWords, maxWords)).join(" ") + "...";  // Potong dan tambahkan '...'
+  return words.slice(0, Math.max(minWords, maxWords)).join(" ") + "...";
 };
 
-export default function CardWhite({ id, title, author, content }) {
+export default function CardWhite({ id, title, author, content, scraped_at }) {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/cerpen/${id}`, { state: { scraped_at } });
+  };
+
   return (
     <div
       className="max-w-xs w-full p-6 bg-white rounded-2xl shadow-md space-y-4 cursor-pointer transition-transform duration-200 hover:shadow-xl hover:scale-105 active:scale-95"
-      onClick={() => alert(`Card dengan ID: ${id} diklik!`)}  // Menampilkan id saat kartu diklik
+      onClick={handleCardClick}  // Menambahkan onClick untuk navigasi
     >
       {/* Judul */}
-      <h2 className="text-xl font-semibold text-gray-800">{getShortTitle(title)}</h2> {/* Menampilkan title yang sudah dipotong */}
+      <h2 className="text-xl font-semibold text-gray-800">{getShortTitle(title)}</h2>
 
       {/* Deskripsi */}
       <p className="text-sm text-gray-600 leading-relaxed">
-        {getShortContent(content)} {/* Menampilkan konten yang sudah dipotong */}
+        {getShortContent(content)}
       </p>
 
       {/* Rating */}
