@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../firebase/authContext.jsx';
 import BackgroundPattern from '../Component/Background.jsx';
+import { FaGoogle } from "react-icons/fa";
+import { FaFacebook } from "react-icons/fa";
+import { PiEye } from "react-icons/pi";
+import { PiEyeClosed } from "react-icons/pi";
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -13,11 +17,39 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // Regex patterns untuk validasi
+  const validationPatterns = {
+    email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+    password: /^.{6,}$/
+  };
+
+  // Fungsi validasi menggunakan regex
+  const validateForm = (email, password) => {
+    // Validasi email
+    if (!validationPatterns.email.test(email)) {
+      return 'Format email tidak valid (harus mengandung @)';
+    }
+    
+    // Validasi password
+    if (!validationPatterns.password.test(password)) {
+      return 'Password minimal 6 karakter';
+    }
+    
+    return null; // Tidak ada error
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     
     if (!email || !password) {
       setError('Email dan password harus diisi');
+      return;
+    }
+
+    // Validasi menggunakan regex
+    const validationError = validateForm(email, password);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
@@ -40,6 +72,9 @@ export default function Login() {
           break;
         case 'auth/too-many-requests':
           setError('Terlalu banyak percobaan. Coba lagi nanti.');
+          break;
+        case 'auth/invalid-credential':
+          setError('Email atau password salah');
           break;
         default:
           setError('Terjadi kesalahan. Silakan coba lagi.');
@@ -85,7 +120,7 @@ export default function Login() {
           {/* Right side - Login form */}
           <div className="flex-shrink-0 ml-16">
             <div className="bg-white rounded-3xl shadow-2xl p-8 w-[480px] border border-gray-100">
-              <h2 className="text-xl font-bold text-center text-gray-800 mb-2">
+              <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">
                 Selamat Kembali!
               </h2>
               <p className="text-gray-600 text-center mb-8 text-sm">
@@ -124,21 +159,35 @@ export default function Login() {
                     className="absolute inset-y-0 right-3 flex items-center"
                   >
                     {showPassword ? (
-                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19C7 19 2.73 15.61 1 12c.64-1.15 1.54-2.19 2.67-3" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    ) : (
-                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18M4.21 4.21a10.05 10.05 0 0116.58 0" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.88 9.88a3 3 0 014.24 4.24" />
-                      </svg>
-                    )}
+                        <PiEye />
+                      ) : (
+                        <PiEyeClosed />
+                      )}
                   </button>
                 </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <input
+                      id="remember-me"
+                      name="remember-me"
+                      type="checkbox"
+                      className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    />
+                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-600">
+                      Ingat saya
+                    </label>
+                  </div>
+                  <div className="text-sm">
+                    <a href="#" className="text-purple-600 hover:text-purple-500">
+                      Lupa password?
+                    </a>
+                  </div>
+                </div>
+                
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !email || !password}
                   className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-medium transition-colors transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Masuk...' : 'Masuk'}
@@ -150,9 +199,13 @@ export default function Login() {
               </div>
               <div className="mt-4 flex gap-4">
                 <button className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors">
-                  <span className="text-sm font-medium text-gray-700">Google</span>
+                  <FaGoogle />
+                  <span className="text-sm font-medium text-gray-700">
+                    Google
+                    </span>
                 </button>
                 <button className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors">
+                  <FaFacebook />
                   <span className="text-sm font-medium text-gray-700">Facebook</span>
                 </button>
               </div>

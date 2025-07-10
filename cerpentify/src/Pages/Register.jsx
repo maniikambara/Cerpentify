@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../firebase/authContext.jsx';
 import BackgroundBlue from '../Component/Backgroundblue.jsx';
+import { FaGoogle } from "react-icons/fa";
+import { FaFacebook } from "react-icons/fa";
+import { PiEye } from "react-icons/pi";
+import { PiEyeClosed } from "react-icons/pi";
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -15,6 +19,33 @@ export default function Register() {
   const { signup } = useAuth();
   const navigate = useNavigate();
 
+  // Regex patterns untuk validasi
+  const validationPatterns = {
+    email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+    username: /^[a-zA-Z0-9_-]{3,20}$/,
+    password: /^.{6,}$/
+  };
+
+  // Fungsi validasi menggunakan regex
+  const validateForm = (email, username, password) => {
+    // Validasi email
+    if (!validationPatterns.email.test(email)) {
+      return 'Format email tidak valid (harus mengandung @)';
+    }
+    
+    // Validasi username
+    if (!validationPatterns.username.test(username)) {
+      return 'Username harus 3-20 karakter, hanya huruf, angka, underscore, dan dash';
+    }
+    
+    // Validasi password
+    if (!validationPatterns.password.test(password)) {
+      return 'Password minimal 6 karakter';
+    }
+    
+    return null; // Tidak ada error
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     
@@ -22,14 +53,16 @@ export default function Register() {
       setError('Semua field harus diisi');
       return;
     }
+
+    // Validasi menggunakan regex
+    const validationError = validateForm(email, username, password);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     
     if (!agreeTerms) {
       setError('Anda harus menyetujui syarat dan ketentuan');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Password minimal 6 karakter');
       return;
     }
 
@@ -143,15 +176,9 @@ export default function Register() {
                     className="absolute inset-y-0 right-3 flex items-center"
                   >
                     {showPassword ? (
-                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19C7 19 2.73 15.61 1 12c.64-1.15 1.54-2.19 2.67-3" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
+                      <PiEye />
                     ) : (
-                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18M4.21 4.21a10.05 10.05 0 0116.58 0" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.88 9.88a3 3 0 014.24 4.24" />
-                      </svg>
+                      <PiEyeClosed />
                     )}
                   </button>
                 </div>
@@ -181,14 +208,18 @@ export default function Register() {
               <div className="mt-6 text-center">
                 <span className="text-gray-500 text-sm">Atau lanjutkan dengan</span>
               </div>
-              <div className="mt-4 flex gap-4">
-                <button className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors">
-                  <span className="text-sm font-medium text-gray-700">Google</span>
-                </button>
-                <button className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors">
-                  <span className="text-sm font-medium text-gray-700">Facebook</span>
-                </button>
-              </div>
+                <div className="mt-4 flex gap-4">
+                  <button className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors">
+                    <FaGoogle />
+                    <span className="text-sm font-medium text-gray-700">
+                      Google
+                      </span>
+                  </button>
+                  <button className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors">
+                    <FaFacebook />
+                    <span className="text-sm font-medium text-gray-700">Facebook</span>
+                  </button>
+                </div>
             </div>
           </div>
         </div>
