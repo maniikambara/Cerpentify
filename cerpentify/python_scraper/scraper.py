@@ -96,7 +96,7 @@ class CerpenScraper:
         links = soup.find_all('a', href=re.compile(r'\.html$'))
         
         for link in links:
-            if link.find('strong'):  # Links with strong tags are usually cerpen titles
+            if link.find('strong'):
                 cerpen_url = urljoin(url, link.get('href'))
                 cerpen_title = link.find('strong').get_text().strip()
                 
