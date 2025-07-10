@@ -7,8 +7,8 @@ import sys
 def test_firebase_connection():
     try:
         # Check if credentials file exists
-        credential_path = 'firebase-credentials.json'
-        backend_path = 'backend/firebase-credentials.json'
+        credential_path = './firebase-credentials.json'
+        backend_path = './firebase-credentials.json'
         
         if os.path.exists(credential_path):
             cred_file = credential_path

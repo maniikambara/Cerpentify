@@ -7,12 +7,24 @@ import threading
 app = Flask(__name__)
 CORS(app)
 
+# Check if Firebase is initialized
+if db is None:
+    print("Warning: Firebase not initialized. Please check your credentials.")
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
-    return jsonify({"status": "healthy", "message": "Backend is running"})
+    firebase_status = "connected" if db is not None else "disconnected"
+    return jsonify({
+        "status": "healthy", 
+        "message": "Backend is running",
+        "firebase": firebase_status
+    })
 
 @app.route('/api/categories', methods=['GET'])
 def get_categories():
+    if db is None:
+        return jsonify({"error": "Firebase not initialized"}), 500
+        
     try:
         categories = []
         docs = db.collection('categories').stream()
@@ -28,6 +40,9 @@ def get_categories():
 
 @app.route('/api/cerpen', methods=['GET'])
 def get_cerpen():
+    if db is None:
+        return jsonify({"error": "Firebase not initialized"}), 500
+        
     try:
         category = request.args.get('category')
         limit = int(request.args.get('limit', 10))
@@ -53,6 +68,9 @@ def get_cerpen():
 
 @app.route('/api/cerpen/<cerpen_id>', methods=['GET'])
 def get_cerpen_detail(cerpen_id):
+    if db is None:
+        return jsonify({"error": "Firebase not initialized"}), 500
+        
     try:
         doc = db.collection('cerpen').document(cerpen_id).get()
         
@@ -68,6 +86,9 @@ def get_cerpen_detail(cerpen_id):
 
 @app.route('/api/scrape', methods=['POST'])
 def start_scrape():
+    if db is None:
+        return jsonify({"error": "Firebase not initialized"}), 500
+        
     try:
         def run_scraper():
             scraper = CerpenScraper()
