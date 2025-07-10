@@ -18,7 +18,7 @@ import {
     updateDoc 
 }
 from 'firebase/firestore';
-import { auth, db } from '../firebase/firebase';
+import { auth, db } from '../Firebase/firebase';
 
 const AuthContext = createContext();
 

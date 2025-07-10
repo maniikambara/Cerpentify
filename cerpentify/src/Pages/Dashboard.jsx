@@ -1,44 +1,23 @@
 import React from "react";
-import BackgroundPattern from "../Component/Background.jsx";
+import BackgroundDashboard from "../Component/BgLanding.jsx";
 import Navbar from "../Component/Navbar.jsx";
 import CardWhite from "../Component/Whitecard.jsx";
 
 export default function Dashboard() {
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
-      <BackgroundPattern />
+      <div className="fixed"><BackgroundDashboard /></div>
       <div style={{ position: "fixed", top: 0, left: 0, width: "100%", zIndex: 100 }}>
         <Navbar />
       </div>
       <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "50px", position: "absolute", top: "5%", left: "50%", transform: "translate(-50%, 0)", zIndex: 5, width: "100%", height: "auto", marginTop: "100px", paddingLeft: "5vw", paddingRight: "5vw", boxSizing: "border-box" }}>
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "50px", width: "100%" }}>
-          <CardWhite />
-          <CardWhite />
-          <CardWhite />
-          <CardWhite />
-          <CardWhite />
-        </div>
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "50px", width: "100%" }}>
-          <CardWhite />
-          <CardWhite />
-          <CardWhite />
-          <CardWhite />
-          <CardWhite />
-        </div>
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "50px", width: "100%" }}>
-          <CardWhite />
-          <CardWhite />
-          <CardWhite />
-          <CardWhite />
-          <CardWhite />
-        </div>
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "50px", width: "100%" }}>
-          <CardWhite />
-          <CardWhite />
-          <CardWhite />
-          <CardWhite />
-          <CardWhite />
-        </div>
+        {[...Array(4)].map((_, rowIdx) => (
+          <div key={rowIdx} style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "50px", width: "100%" }}>
+            {[...Array(5)].map((_, cardIdx) => (
+              <CardWhite key={cardIdx} />
+            ))}
+          </div>
+        ))}
       </div>
       {/* Floating Action Button */}
       <button
@@ -58,7 +37,7 @@ export default function Dashboard() {
           <span className="absolute bottom-2 right-2 bg-white rounded-full border border-gray-200 w-7 h-7 flex items-center justify-center">
             <svg className="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 5v10M5 10h10" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round" />
-            </svg>
+            </svg>  
           </span>
         </span>
       </button>

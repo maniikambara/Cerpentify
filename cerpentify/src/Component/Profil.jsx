@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../firebase/authContext.jsx';
+import { useAuth } from '../Firebase/authContext.jsx';
 
 const Profil = ({ onClose }) => {
   const { currentUser, userProfile, updateUserProfile, updateUserPassword, logout } = useAuth();
