@@ -21,7 +21,6 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/kontak" element={<Contact />} />
           <Route path="/kontakbefore" element={<ContactPageBefore />} />
-          
         </Routes>
       </BrowserRouter>
     </AuthProvider>
