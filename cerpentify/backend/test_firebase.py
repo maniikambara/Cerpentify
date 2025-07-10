@@ -1,9 +1,8 @@
-# test_firebase.py
 import firebase_admin
 from firebase_admin import credentials, firestore
 
 try:
-    cred = credentials.Certificate('firebase-credentials.json')
+    cred = credentials.Certificate('./cerpentify/backend/firebase-credentials.json')
     app = firebase_admin.initialize_app(cred)
     db = firestore.client()
     print("Firebase connection successful!")

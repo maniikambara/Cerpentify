@@ -77,7 +77,7 @@ class CerpenScraper:
             
         # Find the "Cerpen of The Month" link
         cotm_link = soup.find('a', {'class': 'tombol-link tombol-header'}, 
-                             href=re.compile(r'cerpen-of-the-month'))
+                                href=re.compile(r'cerpen-of-the-month'))
         
         if cotm_link:
             return urljoin(self.base_url, cotm_link.get('href'))
@@ -153,7 +153,7 @@ class CerpenScraper:
                 while current_element:
                     # Stop if we find the sharing message
                     if current_element.find('strong') and \
-                       'Kamu suka cerpen ini?' in current_element.get_text():
+                        'Kamu suka cerpen ini?' in current_element.get_text():
                         break
                         
                     content_parts.append(current_element.get_text().strip())
