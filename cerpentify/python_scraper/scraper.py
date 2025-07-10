@@ -8,11 +8,17 @@ from datetime import datetime
 
 class CerpenScraper:
     def __init__(self):
+        # Check if Firebase is properly initialized
+        if db is None:
+            raise Exception("Firebase database is not initialized. Please check firebase_config.py")
+        self.db = db
         self.base_url = "https://web.archive.org/web/20181108180538/http://cerpenmu.com/"
         self.session = requests.Session()
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         })
+        self.category_counter = 1
+        self.cerpen_counters = {}  # To track cerpen count per category
         
     def get_page(self, url):
         """Get page content with error handling"""
@@ -44,14 +50,23 @@ class CerpenScraper:
                 category_name = link.get_text().strip()
                 category_url = urljoin(self.base_url, link.get('href'))
                 
+                # Generate category ID
+                category_id = f"CAT{self.category_counter}"
+                
                 category_data = {
+                    'id': category_id,
                     'name': category_name,
                     'url': category_url,
                     'created_at': datetime.now()
                 }
                 
                 categories.append(category_data)
-                print(f"Found category: {category_name}")
+                print(f"Found category: {category_name} (ID: {category_id})")
+                
+                # Initialize cerpen counter for this category
+                self.cerpen_counters[category_name] = 0
+                
+                self.category_counter += 1
                 
         return categories
         
@@ -59,16 +74,34 @@ class CerpenScraper:
         """Save categories to Firebase"""
         print("Saving categories to Firebase...")
         
+        if not categories:
+            print("No categories to save")
+            return
+            
         for category in categories:
             try:
-                # Use category name as document ID
-                doc_id = category['name'].lower().replace(' ', '_')
-                db.collection('categories').document(doc_id).set(category)
-                print(f"Saved category: {category['name']}")
+                # Use category ID as document ID
+                doc_id = category['id']
+                self.db.collection('categories').document(doc_id).set(category)
+                print(f"Saved category: {category['name']} (ID: {category['id']})")
                 time.sleep(0.5)  # Rate limiting
             except Exception as e:
                 print(f"Error saving category {category['name']}: {e}")
                 
+    def get_category_id_by_name(self, category_name):
+        """Get category ID from Firebase by category name"""
+        try:
+            categories_ref = self.db.collection('categories')
+            docs = categories_ref.where('name', '==', category_name).limit(1).get()
+            
+            for doc in docs:
+                return doc.get('id')
+            
+            return None
+        except Exception as e:
+            print(f"Error getting category ID for {category_name}: {e}")
+            return None
+            
     def get_cerpen_of_the_month_url(self):
         """Get Cerpen of The Month URL"""
         soup = self.get_page(self.base_url)
@@ -96,7 +129,7 @@ class CerpenScraper:
         links = soup.find_all('a', href=re.compile(r'\.html$'))
         
         for link in links:
-            if link.find('strong'):  # Links with strong tags are usually cerpen titles
+            if link.find('strong'):
                 cerpen_url = urljoin(url, link.get('href'))
                 cerpen_title = link.find('strong').get_text().strip()
                 
@@ -174,10 +207,29 @@ class CerpenScraper:
     def save_cerpen_to_firebase(self, cerpen_data):
         """Save cerpen data to Firebase"""
         try:
-            # Generate document ID from title
-            doc_id = re.sub(r'[^a-zA-Z0-9]', '_', cerpen_data['title'].lower())
-            db.collection('cerpen').document(doc_id).set(cerpen_data)
-            print(f"Saved cerpen: {cerpen_data['title']}")
+            # Get category ID
+            category_name = cerpen_data.get('category', '')
+            category_id = self.get_category_id_by_name(category_name)
+            
+            if not category_id:
+                print(f"Category ID not found for: {category_name}")
+                return False
+                
+            # Increment cerpen counter for this category
+            if category_name not in self.cerpen_counters:
+                self.cerpen_counters[category_name] = 0
+            self.cerpen_counters[category_name] += 1
+            
+            # Generate cerpen ID
+            cerpen_id = f"{category_id}C{self.cerpen_counters[category_name]}"
+            
+            # Add IDs to cerpen data
+            cerpen_data['id'] = cerpen_id
+            cerpen_data['category_id'] = category_id
+            
+            # Use cerpen ID as document ID
+            self.db.collection('cerpen').document(cerpen_id).set(cerpen_data)
+            print(f"Saved cerpen: {cerpen_data['title']} (ID: {cerpen_id})")
             return True
         except Exception as e:
             print(f"Error saving cerpen {cerpen_data.get('title', 'Unknown')}: {e}")
@@ -191,6 +243,9 @@ class CerpenScraper:
         categories = self.scrape_categories()
         if categories:
             self.save_categories_to_firebase(categories)
+        
+        # Wait a bit for Firebase to sync
+        time.sleep(2)
         
         # 2. Get cerpen of the month URL
         cotm_url = self.get_cerpen_of_the_month_url()
