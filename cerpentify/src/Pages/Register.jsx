@@ -70,7 +70,7 @@ export default function Register() {
       setError('');
       setLoading(true);
       await signup(email, password, username);
-      navigate('/'); // Redirect ke dashboard setelah register berhasil
+      navigate('/login');
     } catch (error) {
       console.error('Register error:', error);
       switch (error.code) {

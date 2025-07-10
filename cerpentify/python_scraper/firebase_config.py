@@ -5,11 +5,25 @@ import json
 
 def initialize_firebase():
     """Initialize Firebase Admin SDK"""
-    credential_path = './cerpentify/python_scraper/firebase-credentials.json'
+    # Try multiple possible paths
+    possible_paths = [
+        './firebase-credentials.json',
+        './cerpentify/python_scraper/firebase-credentials.json',
+        'firebase-credentials.json'
+    ]
     
-    # Check if credentials file exists
-    if not os.path.exists(credential_path):
-        raise FileNotFoundError(f"Firebase credentials file not found at {credential_path}")
+    credential_path = None
+    
+    # Find the correct path
+    for path in possible_paths:
+        if os.path.exists(path):
+            credential_path = path
+            break
+    
+    if not credential_path:
+        raise FileNotFoundError(f"Firebase credentials file not found in any of these locations: {possible_paths}")
+    
+    print(f"Using credentials file: {credential_path}")
     
     # Check if credentials file is valid JSON
     try:

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../firebase/authContext.jsx';
+import { PiEye } from "react-icons/pi";
+import { PiEyeClosed } from "react-icons/pi";
 
 const Profil = ({ onClose }) => {
   const { currentUser, userProfile, updateUserProfile, updateUserPassword, logout } = useAuth();
   const [formData, setFormData] = useState({
-    fullName: '',
     username: '',
     email: '',
     password: '',
@@ -20,7 +21,6 @@ const Profil = ({ onClose }) => {
   useEffect(() => {
     if (userProfile) {
       setFormData({
-        fullName: userProfile.fullName || '',
         username: userProfile.username || '',
         email: userProfile.email || '',
         password: '',
@@ -50,7 +50,6 @@ const Profil = ({ onClose }) => {
       
       // Update profile data
       await updateUserProfile(currentUser.uid, {
-        fullName: formData.fullName,
         username: formData.username,
         email: formData.email,
         age: formData.age
@@ -134,17 +133,6 @@ const Profil = ({ onClose }) => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            <label className="block text-gray-700 font-medium mb-3">Nama Lengkap</label>
-            <input
-              type="text"
-              value={formData.fullName}
-              onChange={(e) => handleInputChange('fullName', e.target.value)}
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              placeholder="Masukkan nama lengkap"
-            />
-          </div>
-          
-          <div>
             <label className="block text-gray-700 font-medium mb-3">Username</label>
             <input
               type="text"
@@ -209,16 +197,10 @@ const Profil = ({ onClose }) => {
                 className="absolute inset-y-0 right-3 flex items-center"
               >
                 {showPassword ? (
-                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19C7 19 2.73 15.61 1 12c.64-1.15 1.54-2.19 2.67-3" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                ) : (
-                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18M4.21 4.21a10.05 10.05 0 0116.58 0" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.88 9.88a3 3 0 014.24 4.24" />
-                  </svg>
-                )}
+                    <PiEye />
+                  ) : (
+                    <PiEyeClosed />
+                  )}
               </button>
             </div>
           </div>
