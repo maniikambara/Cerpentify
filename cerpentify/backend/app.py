@@ -20,7 +20,7 @@ def health_check():
         "firebase": firebase_status
     })
 
-@app.route('/api/categories', methods=['GET'])
+@app.route(r'/api/categories', methods=['GET'])
 def get_categories():
     if db is None:
         return jsonify({"error": "Firebase not initialized"}), 500
@@ -38,7 +38,7 @@ def get_categories():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/cerpen', methods=['GET'])
+@app.route(r'/api/cerpen', methods=['GET'])
 def get_cerpen():
     if db is None:
         return jsonify({"error": "Firebase not initialized"}), 500
@@ -66,7 +66,7 @@ def get_cerpen():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/cerpen/<cerpen_id>', methods=['GET'])
+@app.route(r'/api/cerpen/<cerpen_id>', methods=['GET'])
 def get_cerpen_detail(cerpen_id):
     if db is None:
         return jsonify({"error": "Firebase not initialized"}), 500
@@ -84,7 +84,7 @@ def get_cerpen_detail(cerpen_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/scrape', methods=['POST'])
+@app.route(r'/api/scrape', methods=['POST'])
 def start_scrape():
     if db is None:
         return jsonify({"error": "Firebase not initialized"}), 500

@@ -201,8 +201,8 @@ class CerpenScraper:
         print(f"Found {len(cerpen_links)} cerpen links")
         
         # 4. Scrape each cerpen detail
-        for i, link in enumerate(cerpen_links[:5]):  # Limit to first 5 for testing
-            print(f"Processing {i+1}/{len(cerpen_links[:5])}: {link['title']}")
+        for i, link in enumerate(cerpen_links[:300]):
+            print(f"Processing {i+1}/{len(cerpen_links[:300])}: {link['title']}")
             
             cerpen_data = self.scrape_cerpen_detail(link['url'])
             if cerpen_data:
