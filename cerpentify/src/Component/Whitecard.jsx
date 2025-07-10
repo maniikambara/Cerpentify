@@ -1,31 +1,44 @@
 import React from "react";
 
-export default function CardWhite() {
+const getShortContent = (text, minWords = 10, maxWords = 20) => {
+
+  const cleanText = text.replace(/[^\w\s]/g, "");
+  const words = cleanText.split(" ");
+
+  if (words.length <= maxWords) {
+    return text; 
+  }
+
+  return words.slice(0, Math.max(minWords, maxWords)).join(" ") + "...";  
+};
+
+const getShortTitle = (title, minWords = 2, maxWords = 3) => {
+  const cleanTitle = title.replace(/[^\w\s]/g, "");
+  const words = cleanTitle.split(" ");
+
+  if (words.length <= maxWords) {
+    return title; 
+  }
+
+  return words.slice(0, Math.max(minWords, maxWords)).join(" ") + "..."; 
+};
+
+export default function CardWhite({ id, title, author, content }) {
   return (
     <div
-      className="max-w-sm p-6 bg-white rounded-2xl shadow-md space-y-4 cursor-pointer transition-transform duration-200 hover:shadow-xl hover:scale-105 active:scale-95"
-      onClick={() => alert('Card diklik!')}
+      className="max-w-xs w-75 h-75 p-9 mb-10 bg-white rounded-2xl shadow-md space-y-4 cursor-pointer transition-transform duration-200 hover:shadow-xl hover:scale-105 active:scale-95"
+      onClick={() => alert(`Card dengan ID: ${id} diklik!`)}
     >
       {/* Judul */}
-      <h2 className="text-xl font-semibold text-gray-800">cerpen 3</h2>
+      <h2 className="text-xl font-semibold text-gray-800 break-words whitespace-nowrap overflow-hidden text-ellipsis">{getShortTitle(title)}</h2> {/* Menampilkan title yang sudah dipotong */}
 
       {/* Deskripsi */}
-      <p className="text-sm text-gray-600 leading-relaxed">
-        Sudah lebih satu setengah tahun ia merasa kesepian setiap malam
-        menjemputnya. Kesunyian dan keheningan hanya itu yang ia rasakan.
-      </p>
+      <p className="text-sm text-gray-600 leading-relaxed break-words overflow-hidden text-ellipsis h-24">{getShortContent(content)} {/* Menampilkan konten yang sudah dipotong */}</p>
 
       {/* Rating */}
-      <div className="flex items-center justify-between">
-        <div className="flex text-purple-400 text-xl space-x-1">
-          {[...Array(5)].map((_, i) => (
-            <span key={i}>★</span>
-          ))}
-        </div>
-        <span className="text-sm text-purple-600 border border-purple-300 px-3 py-1 rounded-full">
-          1056 Reviews
-        </span>
-      </div>
+      <span className="text-sm text-purple-600 border border-purple-300 px-3 py-1 rounded-full">
+        1056 Reviews
+      </span>
 
       {/* Penulis */}
       <div className="flex items-center space-x-3 pt-2">
@@ -45,7 +58,7 @@ export default function CardWhite() {
           </svg>
         </div>
         <div>
-          <p className="text-sm font-semibold text-gray-800">Jane Copper</p>
+          <p className="text-sm font-semibold text-gray-800">{author}</p>
           <p className="text-xs text-gray-500">Penulis</p>
         </div>
       </div>
