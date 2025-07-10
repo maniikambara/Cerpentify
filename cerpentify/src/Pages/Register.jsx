@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../firebase/authContext.jsx';
 import BackgroundBlue from '../Component/Backgroundblue.jsx';
 
 export default function Register() {
@@ -8,22 +9,62 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const { signup } = useAuth();
   const navigate = useNavigate();
 
-  const handleRegister = () => {
-    // Tambahkan logika pendaftaran di sini
-    console.log('Register clicked', { email, username, password, agreeTerms });
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    
+    if (!email || !username || !password) {
+      setError('Semua field harus diisi');
+      return;
+    }
+    
+    if (!agreeTerms) {
+      setError('Anda harus menyetujui syarat dan ketentuan');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password minimal 6 karakter');
+      return;
+    }
+
+    try {
+      setError('');
+      setLoading(true);
+      await signup(email, password, username);
+      navigate('/'); // Redirect ke dashboard setelah register berhasil
+    } catch (error) {
+      console.error('Register error:', error);
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          setError('Email sudah terdaftar');
+          break;
+        case 'auth/invalid-email':
+          setError('Format email tidak valid');
+          break;
+        case 'auth/weak-password':
+          setError('Password terlalu lemah');
+          break;
+        default:
+          setError('Terjadi kesalahan. Silakan coba lagi.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen relative overflow-hidden">
       <BackgroundBlue />
-      {/* Main content container */}
       <div className="flex items-center justify-center min-h-screen px-8">
         <div className="flex items-center justify-between max-w-7xl w-full">
           {/* Left side - Hero content */}
           <div className="flex-1 max-w-2xl">
-            {/* Top navigation badge */}
             <div className="mb-8">
               <div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-2 border border-purple-200 inline-block">
                 <span className="text-purple-600 font-medium">Website Kumpulan Cerpen Terbaik!</span>
@@ -37,7 +78,6 @@ export default function Register() {
               Baca, bagikan, dan temukan cerita pendek terbaik dari penulis berbakat.<br />
               Mulai petualangan literasi Anda sekarang – gratis, mudah, dan penuh inspirasi!
             </p>
-            {/* Action buttons */}
             <div className="flex gap-4">
               <button 
                 onClick={() => navigate('/login')}
@@ -50,6 +90,7 @@ export default function Register() {
               </button>
             </div>
           </div>
+          
           {/* Right side - Registration form */}
           <div className="flex-shrink-0 ml-16">
             <div className="bg-white rounded-3xl shadow-2xl p-8 w-[480px] border border-gray-100">
@@ -59,7 +100,14 @@ export default function Register() {
               <p className="text-gray-600 text-center mb-8 text-sm">
                 Mulailah menjelajahi perjalanan literasimu. Daftar untuk mengakses koleksi cerpen pribadi, riwayat baca, dan komunitas.
               </p>
-              <div className="space-y-4">
+              
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-600 text-sm">{error}</p>
+                </div>
+              )}
+              
+              <form onSubmit={handleRegister} className="space-y-4">
                 <div>
                   <input
                     type="email"
@@ -67,6 +115,7 @@ export default function Register() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    required
                   />
                 </div>
                 <div>
@@ -76,6 +125,7 @@ export default function Register() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    required
                   />
                 </div>
                 <div className="relative">
@@ -85,6 +135,7 @@ export default function Register() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full pr-10 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    required
                   />
                   <button
                     type="button"
@@ -104,7 +155,7 @@ export default function Register() {
                     )}
                   </button>
                 </div>
-                {/* Terms checkbox */}
+                
                 <div className="flex items-start gap-3 mt-6">
                   <input
                     type="checkbox"
@@ -117,24 +168,24 @@ export default function Register() {
                     Saya menyetujui semua Ketentuan dan Kebijakan Privasi
                   </label>
                 </div>
+                
                 <button
-                  onClick={handleRegister}
-                  className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-medium transition-colors transform hover:scale-105 active:scale-95 mt-6"
-                  disabled={!agreeTerms || !email || !username || !password}
+                  type="submit"
+                  disabled={loading || !agreeTerms || !email || !username || !password}
+                  className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-medium transition-colors transform hover:scale-105 active:scale-95 mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Daftar Sekarang
+                  {loading ? 'Mendaftar...' : 'Daftar Sekarang'}
                 </button>
-              </div>
+              </form>
+              
               <div className="mt-6 text-center">
                 <span className="text-gray-500 text-sm">Atau lanjutkan dengan</span>
               </div>
               <div className="mt-4 flex gap-4">
                 <button className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">…</svg>
                   <span className="text-sm font-medium text-gray-700">Google</span>
                 </button>
                 <button className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors">
-                  <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">…</svg>
                   <span className="text-sm font-medium text-gray-700">Facebook</span>
                 </button>
               </div>

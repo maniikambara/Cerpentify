@@ -1,16 +1,52 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../firebase/authContext.jsx';
 import BackgroundPattern from '../Component/Background.jsx';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // Tambahkan logika autentikasi di sini
-    console.log('Login clicked', { email, password });
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      setError('Email dan password harus diisi');
+      return;
+    }
+
+    try {
+      setError('');
+      setLoading(true);
+      await login(email, password);
+      navigate('/');
+    } catch (error) {
+      console.error('Login error:', error);
+      switch (error.code) {
+        case 'auth/user-not-found':
+          setError('Email tidak ditemukan');
+          break;
+        case 'auth/wrong-password':
+          setError('Password salah');
+          break;
+        case 'auth/invalid-email':
+          setError('Format email tidak valid');
+          break;
+        case 'auth/too-many-requests':
+          setError('Terlalu banyak percobaan. Coba lagi nanti.');
+          break;
+        default:
+          setError('Terjadi kesalahan. Silakan coba lagi.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,7 +81,7 @@ export default function Login() {
               </button>
             </div>
           </div>
-
+          
           {/* Right side - Login form */}
           <div className="flex-shrink-0 ml-16">
             <div className="bg-white rounded-3xl shadow-2xl p-8 w-[480px] border border-gray-100">
@@ -55,7 +91,14 @@ export default function Login() {
               <p className="text-gray-600 text-center mb-8 text-sm">
                 Lanjutkan perjalanan literasimu. Masuk untuk mengakses koleksi cerpen pribadi, riwayat baca, dan komunitas.
               </p>
-              <div className="space-y-6">
+              
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-600 text-sm">{error}</p>
+                </div>
+              )}
+              
+              <form onSubmit={handleLogin} className="space-y-6">
                 <div>
                   <input
                     type="email"
@@ -63,6 +106,7 @@ export default function Login() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    required
                   />
                 </div>
                 <div className="relative">
@@ -72,6 +116,7 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full pr-10 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    required
                   />
                   <button
                     type="button"
@@ -92,25 +137,22 @@ export default function Login() {
                   </button>
                 </div>
                 <button
-                  onClick={handleLogin}
-                  className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-medium transition-colors transform hover:scale-105 active:scale-95"
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-medium transition-colors transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Masuk
+                  {loading ? 'Masuk...' : 'Masuk'}
                 </button>
-              </div>
+              </form>
+              
               <div className="mt-6 text-center">
                 <span className="text-gray-500 text-sm">Atau lanjutkan dengan</span>
               </div>
               <div className="mt-4 flex gap-4">
-                {/* Social Buttons */}
                 <button className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors">
-                  {/* Google Icon */}
-                  <svg className="w-5 h-5" viewBox="0 0 24 24">…</svg>
                   <span className="text-sm font-medium text-gray-700">Google</span>
                 </button>
                 <button className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors">
-                  {/* Facebook Icon */}
-                  <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">…</svg>
                   <span className="text-sm font-medium text-gray-700">Facebook</span>
                 </button>
               </div>
