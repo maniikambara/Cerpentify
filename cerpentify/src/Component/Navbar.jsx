@@ -20,7 +20,7 @@ const Navbar = () => {
         {/* Navigation Links */}
         <div className="flex gap-8">
           <a
-            href="/"
+            href="/dashboard"
             className="text-gray-800 text-lg font-medium hover:text-blue-500 transition duration-300 ease-in-out transform hover:scale-105"
           >
             Beranda
