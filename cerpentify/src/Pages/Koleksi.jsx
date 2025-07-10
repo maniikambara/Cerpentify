@@ -1,4 +1,3 @@
-// Koleksi.jsx
 import React, { useState, useEffect } from "react";
 import BackgroundBlue from "../Component/Backgroundblue.jsx";
 import Navbar from "../Component/Navbar.jsx";
@@ -8,6 +7,9 @@ import { collection, getDocs } from "firebase/firestore";
 
 export default function Koleksi() {
   const [cerpenList, setCerpenList] = useState([]);
+  const [filteredCerpen, setFilteredCerpen] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   // Fungsi untuk mengambil data cerpen di Firestore
   const fetchCerpenData = async () => {
@@ -19,15 +21,36 @@ export default function Koleksi() {
         ...doc.data(),  // Menambahkan data dokumen
       }));
       setCerpenList(cerpenData);  // Menyimpan data cerpen beserta id ke state
+      setFilteredCerpen(cerpenData);  // Inisialisasi filteredCerpen dengan data awal
     } catch (error) {
       console.error("Error fetching cerpen data:", error);
     }
   };
 
+  // Fungsi untuk menangani pencarian cerpen berdasarkan judul dan kategori
+  const handleSearch = (searchTerm, selectedCategory) => {
+    let filtered = cerpenList;
+
+    // Filter berdasarkan judul
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (cerpen) =>
+          cerpen.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter berdasarkan kategori
+    if (selectedCategory) {
+      filtered = filtered.filter((cerpen) => cerpen.category === selectedCategory);
+    }
+
+    setFilteredCerpen(filtered);  // Menampilkan hasil pencarian berdasarkan kategori dan judul
+  };
+
   // Mengambil data cerpen ketika komponen pertama kali dimuat
   useEffect(() => {
     fetchCerpenData();
-  }, []); // Empty dependency array berarti hanya sekali ketika pertama kali mount
+  }, []); // Hanya sekali saat mount
 
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
@@ -43,7 +66,7 @@ export default function Koleksi() {
           zIndex: 100,
         }}
       >
-        <Navbar />
+        <Navbar onSearch={handleSearch} />
       </div>
       <div
         style={{
@@ -71,13 +94,13 @@ export default function Koleksi() {
             key={rowIdx}
             style={{
               display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              justifyContent: "center", // Untuk menyejajarkan kartu di tengah
+              alignItems: "center", // Untuk menyejajarkan kartu secara vertikal
               gap: "50px",
               width: "100%",
             }}
           >
-            {cerpenList.slice(rowIdx * 5, rowIdx * 5 + 5).map((cerpen, cardIdx) => (
+            {filteredCerpen.slice(rowIdx * 5, rowIdx * 5 + 5).map((cerpen, cardIdx) => (
               <CardWhite
                 key={cardIdx}
                 id={cerpen.id}  // Menyertakan id sebagai prop

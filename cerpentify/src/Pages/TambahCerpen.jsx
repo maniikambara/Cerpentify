@@ -20,7 +20,7 @@ const TambahCerpen = () => {
 
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
-      <BackgroundBlue />
+      <BackgroundBlue />  
       <div style={{ position: "fixed", top: 0, left: 0, width: "100%", zIndex: 100 }}>
         <Navbar />
       </div>
