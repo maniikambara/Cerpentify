@@ -8,6 +8,7 @@ import Register from './Pages/Register.jsx';
 import Contact from './Pages/Contact.jsx';
 import Landing from './Pages/Landing.jsx';
 import ContactPageBefore from './Pages/ContactBefore.jsx';
+import TambahCerpen from './Pages/TambahCerpen.jsx';
 
 function App() {
   return (
@@ -20,7 +21,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/kontak" element={<Contact />} />
-          <Route path="/kontakbefore" element={<ContactPageBefore />} />
+          <Route path="/kontak" element={<Contact />} />
+          <Route path="/tambah" element={<TambahCerpen />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

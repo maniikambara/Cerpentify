@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const FloatButton = () => {
   return (
     <Link
-      to="/tambah-cerpen"
+      to="/tambah"
       className="fixed bottom-8 right-20 w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center z-[200] border border-gray-200 hover:shadow-2xl transition duration-200 transform hover:scale-110 active:scale-95"
       style={{ boxShadow: "0 2px 12px 0 rgba(0,0,0,0.10)" }}
       aria-label="Tambah File"
