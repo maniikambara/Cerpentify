@@ -8,16 +8,16 @@ import computer from "../assets/computer.png";
 import cat from "../assets/cat.png";
 
 const icons = [
-  { src: computer, alt: "computer icon", style: "top-[10%] left-[10%]", size: 100 },
-  { src: abc, alt: "abc icon", style: "top-[15%] left-[30%]", size: 100 },
-  { src: globe, alt: "globe icon", style: "top-[17%] left-[90%]", size: 100},
-  { src: shape1, alt: "shape1 icon", style: "bottom-[15%] left-[30%]", size: 100 },
-  { src: globe, alt: "globe icon", style: "bottom-[10%] right-[10%]", size: 100 },
-  { src: computer, alt: "computer icon", style: "bottom-[20%] right-[5%]", size: 100 },
-  { src: shape2, alt: "shape2 icon", style: "top-[10%] right-[10%]", size: 100 },
-  { src: abc, alt: "abc icon", style: "bottom-[25%] left-[15%]", size: 100 },
-  { src: shape3, alt: "shape3 icon", style: "top-[35%] right-[15%]", size: 100 },
-  { src: cat, alt: "cat icon", style: "bottom-[10%] right-[40%]", size: 100 },
+  { src: computer, alt: "computer icon", style: "top-[10%] left-[10%]", size: 40 },
+  { src: abc, alt: "abc icon", style: "top-[15%] left-[30%]", size: 32 },
+  { src: globe, alt: "globe icon", style: "top-[40%] left-[10%]" },
+  { src: shape1, alt: "shape1 icon", style: "bottom-[15%] left-[30%]" },
+  { src: globe, alt: "globe icon", style: "bottom-[10%] right-[10%]" },
+  { src: computer, alt: "computer icon", style: "bottom-[20%] right-[5%]" },
+  { src: shape2, alt: "shape2 icon", style: "top-[10%] right-[10%]" },
+  { src: abc, alt: "abc icon", style: "bottom-[25%] left-[15%]" },
+  { src: shape3, alt: "shape3 icon", style: "top-[35%] right-[15%]" },
+  { src: cat, alt: "cat icon", style: "bottom-[10%] right-[40%]" },
 ];
 
 const squiggles = [
@@ -27,9 +27,9 @@ const squiggles = [
   { style: "bottom-[40%] left-[60px]" },
 ];
 
-export default function BackgroundLanding() {
+export default function BglandingroundBlue() {
   return (
-    <div className="absolute inset-0 w-full min-h-screen bg-[#FCEEED] overflow-hidden -z-10">
+    <div className="absolute inset-0 w-full min-h-screen bg-[#EBECFA] overflow-hidden -z-10">
       {/* Background Icons */}
       {icons.map((icon, idx) => (
         <img

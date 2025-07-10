@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import BackgroundPattern from "../Component/Background.jsx";
+import BackgroundLanding from "../Component/BgLanding.jsx";
 import NavbarLanding from "../Component/NavbarLanding.jsx";
-import BackgroundBlue from "../Component/Backgroundblue.jsx";
+import BglandingroundBlue from "../Component/BgBlueLanding.jsx";
 
 const animatedWords = [
   "Cerita Pendek",
@@ -58,12 +58,13 @@ export default function Landing() {
 
   return (
     <div style={{ position: "relative", width: "100vw", minHeight: "100vh" }}>
-      <BackgroundPattern />
+     
       <div style={{ position: "fixed", top: 0, left: 0, width: "100%", zIndex: 100 }}>
         <NavbarLanding />
       </div>
       {/* Gabungan Hero + Fitur */}
       <section className="w-full min-h-screen flex flex-col items-center justify-center pt-15 pb-20">
+      <BackgroundLanding/>
         {/* Hero */}
         <span
           className="inline-block mb-4 px-4 py-1 rounded-full bg-pink-100 text-pink-400 text-xs font-semibold border border-pink-200 cursor-pointer transition-all duration-300 hover:bg-pink-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-pink-300"
@@ -98,7 +99,7 @@ export default function Landing() {
         </p>
         <div className={`flex flex-col md:flex-row gap-4 justify-center transition-all duration-700 delay-200 ${animate ? "scale-100 opacity-100" : "scale-90 opacity-0"}`}>
           <a
-            href="/koleksi"
+            href="/login"
             className="inline-flex items-center justify-center px-7 py-3 bg-black text-white text-base font-semibold rounded-full shadow-lg hover:bg-gray-900 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-black"
             tabIndex={0}
           >
@@ -115,7 +116,7 @@ export default function Landing() {
         </div>
         </section>
         <section id="fiturutama" className="relative overflow-hidden py-70">
-          <BackgroundBlue />
+        <BglandingroundBlue />
           {/* Fitur Unggulan */}
           <div className="w-full max-w-6xl px-4 mx-auto mt-10 relative z-10">
             <h2 className="text-2xl md:text-4xl font-semibold mb-2 text-gray-900 text-center">Apa yang Bisa Kamu Lakukan di Cerpenify?</h2>

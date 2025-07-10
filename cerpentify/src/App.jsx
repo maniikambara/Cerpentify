@@ -13,7 +13,8 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/Dashboard" element={<Dashboard />} />
           <Route path="/koleksi" element={<Koleksi />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
