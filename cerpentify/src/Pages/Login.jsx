@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../firebase/authContext.jsx';
+import { useAuth } from '../Firebase/authContext.jsx';
 import BackgroundPattern from '../Component/Background.jsx';
 import { FaGoogle } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa";
