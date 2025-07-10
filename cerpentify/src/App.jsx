@@ -8,6 +8,7 @@ import Register from './Pages/Register.jsx';
 import Contact from './Pages/Contact.jsx';
 import Landing from './Pages/Landing.jsx';
 import { Cerpen } from './Pages/Cerpen.jsx';
+import TambahCerpen from './Pages/TambahCerpen.jsx';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/kontak" element={<Contact />} />
           <Route path="/cerpen/:id" element={<Cerpen />} /> {/* Rute untuk cerpen berdasarkan ID */}
+          <Route path="/tambah/" element={<TambahCerpen />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
