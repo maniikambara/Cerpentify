@@ -84,8 +84,64 @@ def get_cerpen_detail(cerpen_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+def check_existing_data():
+    """Check if categories and cerpen collections already have data"""
+    if db is None:
+        return False, False
+    
+    try:
+        # Check categories
+        categories_ref = db.collection('categories')
+        categories_docs = list(categories_ref.limit(1).stream())
+        has_categories = len(categories_docs) > 0
+        
+        # Check cerpen
+        cerpen_ref = db.collection('cerpen')
+        cerpen_docs = list(cerpen_ref.limit(1).stream())
+        has_cerpen = len(cerpen_docs) > 0
+        
+        return has_categories, has_cerpen
+    except Exception as e:
+        print(f"Error checking existing data: {e}")
+        return False, False
+
+# Update route /api/scrape
 @app.route('/api/scrape', methods=['POST'])
 def start_scrape():
+    if db is None:
+        return jsonify({"error": "Firebase not initialized"}), 500
+    
+    try:
+        # Check if data already exists
+        has_categories, has_cerpen = check_existing_data()
+        
+        if has_categories and has_cerpen:
+            return jsonify({
+                "message": "Data sudah tersedia di database. Tidak perlu scraping.",
+                "has_categories": has_categories,
+                "has_cerpen": has_cerpen
+            })
+        
+        def run_scraper():
+            scraper = CerpenScraper()
+            scraper.run_full_scrape()
+            
+        # Run scraper in background thread
+        thread = threading.Thread(target=run_scraper)
+        thread.daemon = True
+        thread.start()
+        
+        return jsonify({
+            "message": "Data tidak lengkap. Scraping dimulai dalam background",
+            "has_categories": has_categories,
+            "has_cerpen": has_cerpen
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# Tambahkan route baru untuk force scraping
+@app.route('/api/scrape/force', methods=['POST'])
+def force_scrape():
     if db is None:
         return jsonify({"error": "Firebase not initialized"}), 500
         
@@ -99,7 +155,7 @@ def start_scrape():
         thread.daemon = True
         thread.start()
         
-        return jsonify({"message": "Scraping started in background"})
+        return jsonify({"message": "Force scraping dimulai dalam background"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

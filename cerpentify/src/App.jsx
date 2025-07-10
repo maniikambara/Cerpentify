@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './Firebase/AuthContext';
+import { AuthProvider } from './firebase/authContext.jsx';
 import Dashboard from './Pages/Dashboard.jsx';
 import Koleksi from './Pages/Koleksi.jsx';
 import Login from './Pages/Login.jsx';
