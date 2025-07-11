@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
   // Register function
-const signup = async (email, password, username) => {
+    const signup = async (email, password, username) => {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
@@ -47,17 +47,17 @@ const signup = async (email, password, username) => {
             uid: user.uid,
             email: email,
             username: username,
-            liked_cn: [],
-            cerpenku: [],
+            liked_cn: [], // array kosong
+            cerpenku: [], // array kosong
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         });
 
-        return user;
-    } catch (error) {
-        throw error;
-    }
-};
+            return user;
+        } catch (error) {
+            throw error;
+        }
+    };
 
   // Login function
     const login = (email, password) => {

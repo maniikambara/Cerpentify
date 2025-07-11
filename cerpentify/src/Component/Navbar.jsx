@@ -48,8 +48,8 @@ const Navbar = ({ onSearch }) => {
     onSearch(searchTerm, event.target.value); // Kirimkan kategori yang dipilih ke Dashboard
   };
 
-  // Mengecek apakah kita sedang berada di halaman ContactPage
-  const isContactPage = location.pathname === "/kontak";
+  // Mengecek apakah kita sedang berada di halaman Dashboard atau Koleksi
+  const isDashboardOrKoleksiPage = location.pathname === "/dashboard" || location.pathname === "/koleksi" || location.pathname === "/cerpenku" ;
 
   return (
     <>
@@ -80,7 +80,7 @@ const Navbar = ({ onSearch }) => {
             Kontak
           </a>
           <a
-            href="#myStories"
+            href="/cerpenku"
             className="text-gray-800 text-lg font-medium hover:text-blue-500 transition duration-300 ease-in-out transform hover:scale-105"
           >
             Cerpenku
@@ -90,7 +90,7 @@ const Navbar = ({ onSearch }) => {
         {/* Search and Account Section */}
         <div className="flex items-center gap-6">
           {/* Category Dropdown */}
-          {!isContactPage && (  // Menonaktifkan kategori jika di halaman kontak
+          {isDashboardOrKoleksiPage && (  // Menampilkan kategori hanya di Dashboard dan Koleksi
             <select
               value={selectedCategory}
               onChange={handleCategoryChange}
@@ -104,7 +104,7 @@ const Navbar = ({ onSearch }) => {
           )}
 
           {/* Search Bar */}
-          {!isContactPage && (  // Menonaktifkan search bar jika di halaman kontak
+          {isDashboardOrKoleksiPage && (  // Menampilkan search bar hanya di Dashboard dan Koleksi
             <div className="flex items-center">
               <input
                 type="text"

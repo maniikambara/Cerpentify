@@ -1,34 +1,105 @@
-// Koleksi.jsx
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import BackgroundBlue from "../Component/Backgroundblue.jsx";
 import Navbar from "../Component/Navbar.jsx";
-import CardWhite from "../Component/Whitecard.jsx";
 import FloatButton from "../Component/FloatingAdd.jsx";
+import CardWhite from "../Component/Whitecard.jsx";
 import { db } from "../Firebase/firebase"; // Import db dari file firebase.js
 import { collection, getDocs } from "firebase/firestore";
+import { useAuth } from "../Firebase/authContext";
+import { doc, getDoc, query, where  } from "firebase/firestore";
+
+
 
 export default function Koleksi() {
-  const [cerpenList, setCerpenList] = useState([]);
+const { currentUser } = useAuth();
+const [cerpenList, setCerpenList] = useState([]);
+const [filteredCerpen, setFilteredCerpen] = useState([]);
+const [categories, setCategories] = useState([]);
+const [searchTerm, setSearchTerm] = useState("");
+const [selectedCategory, setSelectedCategory] = useState("");
 
-  // Fungsi untuk mengambil data cerpen di Firestore
-  const fetchCerpenData = async () => {
-    try {
-      const cerpenCollection = collection(db, "cerpen");
-      const cerpenSnapshot = await getDocs(cerpenCollection);
-      const cerpenData = cerpenSnapshot.docs.map((doc) => ({
-        id: doc.id,  // Menambahkan id dokumen ke data
-        ...doc.data(),  // Menambahkan data dokumen
-      }));
-      setCerpenList(cerpenData);  // Menyimpan data cerpen beserta id ke state
-    } catch (error) {
-      console.error("Error fetching cerpen data:", error);
-    }
-  };
+// Ambil cerpen yang ada di liked_cn user
+const fetchCerpenData = async () => {
+  try {
+    if (!currentUser) return;
 
-  // Mengambil data cerpen ketika komponen pertama kali dimuat
-  useEffect(() => {
+    // Ambil liked_cn dari dokumen user
+    const userRef = doc(db, "users", currentUser.uid);
+    const userSnap = await getDoc(userRef);
+    const likedCn = userSnap.exists() ? userSnap.data().liked_cn || [] : [];
+
+    // Ambil semua cerpen
+    const cerpenCollection = collection(db, "cerpen");
+    const cerpenSnapshot = await getDocs(cerpenCollection);
+    const cerpenData = cerpenSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    // Filter hanya cerpen yang masuk koleksi user
+    const koleksiCerpen = cerpenData.filter((cerpen) => likedCn.includes(cerpen.id));
+
+    // Hitung jumlah ulasan tiap cerpen
+    const cerpenWithUlasanCount = await Promise.all(
+      koleksiCerpen.map(async (cerpen) => {
+        const ulasanQuery = query(
+          collection(db, "ulasan"),
+          where("cerpenID", "==", cerpen.id)
+        );
+        const ulasanSnapshot = await getDocs(ulasanQuery);
+        return {
+          ...cerpen,
+          jumlahUlasan: ulasanSnapshot.size,
+        };
+      })
+    );
+
+    setCerpenList(cerpenWithUlasanCount);
+    setFilteredCerpen(cerpenWithUlasanCount);
+
+    // Ambil semua kategori yang muncul dalam koleksi user
+    const categorySet = new Set();
+    koleksiCerpen.forEach((cerpen) => {
+      if (cerpen.category) categorySet.add(cerpen.category);
+    });
+    setCategories(Array.from(categorySet));
+  } catch (error) {
+    console.error("Error fetching koleksi data:", error);
+  }
+};
+
+// Filter berdasarkan search term dan kategori
+const handleSearch = (search, category) => {
+  let filtered = cerpenList;
+
+  if (search) {
+    filtered = filtered.filter(
+      (cerpen) =>
+        cerpen.title.toLowerCase().includes(search.toLowerCase()) ||
+        cerpen.category.toLowerCase().includes(search.toLowerCase())
+    );
+  }
+
+  if (category) {
+    filtered = filtered.filter((cerpen) => cerpen.category === category);
+  }
+
+  setFilteredCerpen(filtered);
+};
+
+// Ambil koleksi cerpen saat komponen mount
+useEffect(() => {
+  if (currentUser) {
     fetchCerpenData();
-  }, []); // Empty dependency array berarti hanya sekali ketika pertama kali mount
+  }
+}, [currentUser]);
+
+// Update filteredCerpen saat filter berubah
+useEffect(() => {
+  handleSearch(searchTerm, selectedCategory);
+}, [searchTerm, selectedCategory, cerpenList]);
+
 
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
@@ -44,7 +115,7 @@ export default function Koleksi() {
           zIndex: 100,
         }}
       >
-        <Navbar />
+        <Navbar onSearch={handleSearch} />
       </div>
       <div
         style={{
@@ -72,19 +143,21 @@ export default function Koleksi() {
             key={rowIdx}
             style={{
               display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
+              justifyContent: "center", // Untuk menyejajarkan kartu di tengah
+              alignItems: "center", // Untuk menyejajarkan kartu secara vertikal
               gap: "50px",
               width: "100%",
             }}
           >
-            {cerpenList.slice(rowIdx * 5, rowIdx * 5 + 5).map((cerpen, cardIdx) => (
+            {filteredCerpen.slice(rowIdx * 5, rowIdx * 5 + 5).map((cerpen, cardIdx) => (
               <CardWhite
                 key={cardIdx}
-                id={cerpen.id}  // Menyertakan id sebagai prop
+                id={cerpen.id}
                 title={cerpen.title}
                 author={cerpen.author}
                 content={cerpen.content}
+                category={cerpen.category}
+                jumlahUlasan={cerpen.jumlahUlasan}
               />
             ))}
           </div>
@@ -93,7 +166,7 @@ export default function Koleksi() {
       {/* Floating Action Button */}
       <div className="relative min-h-screen">
         <FloatButton />
-      </div>
+        </div>
     </div>
   );
 }

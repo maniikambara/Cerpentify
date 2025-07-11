@@ -18,13 +18,13 @@ const Navbar = () => {
           Home
         </a>
         <a
-          href="#fiturutama"
+          href="/#fiturutama"
           className="text-gray-800 text-lg font-medium hover:text-blue-500 transition duration-300 ease-in-out transform hover:scale-105"
         >
           About
         </a>
         <a
-          href="/kontak"
+          href="/kontakbefore"
           className="text-gray-800 text-lg font-medium hover:text-blue-500 transition duration-300 ease-in-out transform hover:scale-105"
         >
         Contact

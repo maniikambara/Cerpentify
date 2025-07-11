@@ -7,8 +7,10 @@ import Login from './Pages/Login.jsx';
 import Register from './Pages/Register.jsx';
 import Contact from './Pages/Contact.jsx';
 import Landing from './Pages/Landing.jsx';
-import { Cerpen } from './Pages/Cerpen.jsx';
+import ContactPageBefore from './Pages/ContactBefore.jsx';
 import TambahCerpen from './Pages/TambahCerpen.jsx';
+import { Cerpen } from './Pages/Cerpen.jsx'; // Import Cerpen component
+import Cerpenku from './Pages/DashboardCerpenku.jsx';
 
 function App() {
   return (
@@ -21,8 +23,10 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/kontak" element={<Contact />} />
-          <Route path="/cerpen/:id" element={<Cerpen />} /> {/* Rute untuk cerpen berdasarkan ID */}
-          <Route path="/tambah/" element={<TambahCerpen />} />
+          <Route path="/kontak" element={<Contact />} />
+          <Route path="/tambah" element={<TambahCerpen />} />
+          <Route path="/cerpenku" element={<Cerpenku />} />
+          <Route path="/cerpen/:id" element={<Cerpen />} /> {/* Dynamic Route for cerpen details */}
         </Routes>
       </BrowserRouter>
     </AuthProvider>

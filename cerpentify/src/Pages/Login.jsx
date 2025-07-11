@@ -6,14 +6,21 @@ import { FaGoogle } from "react-icons/fa";
 import { FaFacebook } from "react-icons/fa";
 import { PiEye } from "react-icons/pi";
 import { PiEyeClosed } from "react-icons/pi";
+import { GoogleLogin } from '@react-oauth/google';
+import ForgetPass from '../Component/Forgetpass.jsx';
 
 export default function Login() {
+  const [showforget, setShowforget] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
+  const toggleForget = () => {
+    setShowforget(!showforget);
+  };
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -111,7 +118,10 @@ export default function Login() {
               >
                 Belum Punya Akun?
               </button>
-              <button className="bg-white hover:bg-gray-50 text-purple-600 px-8 py-3 rounded-full font-medium border-2 border-purple-200 transition-colors">
+              <button 
+                onClick={toggleForget}
+                className="bg-white hover:bg-gray-50 text-purple-600 px-8 py-3 rounded-full font-medium border-2 border-purple-200 transition-colors"
+              >
                 Lupa Sandi?
               </button>
             </div>
@@ -179,9 +189,6 @@ export default function Login() {
                     </label>
                   </div>
                   <div className="text-sm">
-                    <a href="#" className="text-purple-600 hover:text-purple-500">
-                      Lupa password?
-                    </a>
                   </div>
                 </div>
                 
@@ -197,22 +204,34 @@ export default function Login() {
               <div className="mt-6 text-center">
                 <span className="text-gray-500 text-sm">Atau lanjutkan dengan</span>
               </div>
-              <div className="mt-4 flex gap-4">
-                <button className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors">
-                  <FaGoogle />
+              <div className="mt-4 gap-4 flex items-center justify-center">
+                {/* Google Login Button */}
+                <GoogleLogin
+                  onSuccess={(credentialResponse) => {
+                    console.log(credentialResponse);
+                    navigate("/dashboard");
+                  }}
+                  onError={() => {
+                    console.log('Login Failed');
+                  }}
+                  shape="pill"
+                  size="large"
+                  text="login_with"
+                  theme="outline"
+                  className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors"
+                >
                   <span className="text-sm font-medium text-gray-700">
                     Google
-                    </span>
-                </button>
-                <button className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors">
-                  <FaFacebook />
-                  <span className="text-sm font-medium text-gray-700">Facebook</span>
-                </button>
+                  </span>
+                </GoogleLogin>
               </div>
             </div>
           </div>
         </div>
       </div>
+      
+      {/* ForgetPass Popup */}
+      <ForgetPass isOpen={showforget} onClose={() => setShowforget(false)} />
     </div>
   );
 }

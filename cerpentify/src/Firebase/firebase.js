@@ -5,14 +5,12 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyASnVKcPgQuzTG8xUTHyZWM4MC4sz1d0uE",
-    authDomain: "cerpentify-web.firebaseapp.com",
-    databaseURL: "https://cerpentify-web-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "cerpentify-web",
-    storageBucket: "cerpentify-web.firebasestorage.app",
-    messagingSenderId: "497939114231",
-    appId: "1:497939114231:web:93254fd2d7f4d8ad720bf2",
-    measurementId: "G-9KB7GQPEE3"
+    apiKey: "AIzaSyD1HQxx7cGIxWY4jMcV-wAJuaSpl5whEPc",
+    authDomain: "cerpentify2.firebaseapp.com",
+    projectId: "cerpentify2",
+    storageBucket: "cerpentify2.firebasestorage.app",
+    messagingSenderId: "656422803347",
+    appId: "1:656422803347:web:5f483ad0c515ffb93dba66"
 };
 
 // Initialize Firebase
