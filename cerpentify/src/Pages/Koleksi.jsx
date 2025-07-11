@@ -4,7 +4,6 @@ import BackgroundBlue from "../Component/Backgroundblue.jsx";
 import Navbar from "../Component/Navbar.jsx";
 import FloatButton from "../Component/FloatingAdd.jsx";
 import CardWhite from "../Component/Whitecard.jsx";
-import FloatButton from "../Component/FloatingAdd.jsx";
 import { db } from "../Firebase/firebase"; // Import db dari file firebase.js
 import { collection, getDocs } from "firebase/firestore";
 import { useAuth } from "../Firebase/authContext";
