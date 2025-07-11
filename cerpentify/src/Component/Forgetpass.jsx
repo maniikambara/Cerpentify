@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
 
 export default function ForgetPass({ isOpen, onClose }) {
   const [email, setEmail] = useState('');
@@ -25,7 +24,6 @@ export default function ForgetPass({ isOpen, onClose }) {
       setError('');
       setLoading(true);
       
-      // Simulate API call - replace with actual forgot password logic
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       setShowSuccess(true);

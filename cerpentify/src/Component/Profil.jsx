@@ -23,7 +23,7 @@ const Profil = ({ onClose }) => {
       // Ambil data dari currentUser dan userProfile setelah login
       setFormData({
         username: userProfile?.username || currentUser.displayName || '', // username bisa dari userProfile atau currentUser
-        email: currentUser.email || '', // email langsung dari currentUser
+        email: userProfile?.email || '', // email langsung dari currentUser
         password: '', // Password kosong pada awalnya, user bisa mengubahnya jika diinginkan
         age: userProfile?.age || 18 // Ambil usia dari userProfile atau default 18
       });
