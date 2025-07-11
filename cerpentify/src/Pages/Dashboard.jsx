@@ -8,7 +8,6 @@ import { db } from "../Firebase/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { query, where } from "firebase/firestore";
 
-
 export default function Dashboard() {
   const [cerpenList, setCerpenList] = useState([]);
   const [filteredCerpen, setFilteredCerpen] = useState([]);

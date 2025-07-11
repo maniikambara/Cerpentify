@@ -16,7 +16,6 @@ import { updateDoc, doc as firestoreDoc, arrayUnion } from "firebase/firestore";
 
 
 
-
 export const Cerpen = () => {
     const [text, setText] = useState('');
     const textareaRef = useRef(null);
@@ -142,8 +141,6 @@ export const Cerpen = () => {
     return <p className="text-center mt-20">Memuat cerpen...</p>;
         }
 
-    
-
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
       <BackgroundBlue />
@@ -224,12 +221,10 @@ export const Cerpen = () => {
 
             </div>
         </section>
-
       </div>
-       <div className="relative min-h-screen">
+      <div className="relative min-h-screen">
         <FloatButton />
-        </div>
+      </div>
     </div>
-  )
-}
-
+  );
+};
