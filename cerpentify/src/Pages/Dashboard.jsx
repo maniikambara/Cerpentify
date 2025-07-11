@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import BackgroundPattern from "../Component/Background.jsx";
 import Navbar from "../Component/Navbar.jsx";

@@ -118,8 +118,10 @@ export default function Login() {
               >
                 Belum Punya Akun?
               </button>
-              <button onClick={toggleForget}
-              className="bg-white hover:bg-gray-50 text-purple-600 px-8 py-3 rounded-full font-medium border-2 border-purple-200 transition-colors">
+              <button 
+                onClick={toggleForget}
+                className="bg-white hover:bg-gray-50 text-purple-600 px-8 py-3 rounded-full font-medium border-2 border-purple-200 transition-colors"
+              >
                 Lupa Sandi?
               </button>
             </div>
@@ -187,9 +189,13 @@ export default function Login() {
                     </label>
                   </div>
                   <div className="text-sm">
-                    <a href="#" className="text-purple-600 hover:text-purple-500">
+                    <button 
+                      type="button"
+                      onClick={toggleForget} 
+                      className="text-purple-600 hover:text-purple-500 bg-transparent border-none cursor-pointer"
+                    >
                       Lupa password?
-                    </a>
+                    </button>
                   </div>
                 </div>
                 
@@ -207,33 +213,32 @@ export default function Login() {
               </div>
               <div className="mt-4 gap-4 flex items-center justify-center">
                 {/* Google Login Button */}
-              <GoogleLogin
-              onSuccess={(credentialResponse) => {
-                console.log(credentialResponse);
-                navigate("/dashboard");
-              }}
-              onError={() => {
-                console.log('Login Failed');
-              }}
-              shape="pill"
-              size="large"
-              text="login_with"
-              theme="outline"
-              className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors"
-              >
-              <span className="text-sm font-medium text-gray-700">
-                Google
-              </span>
-            </GoogleLogin>
+                <GoogleLogin
+                  onSuccess={(credentialResponse) => {
+                    console.log(credentialResponse);
+                    navigate("/dashboard");
+                  }}
+                  onError={() => {
+                    console.log('Login Failed');
+                  }}
+                  shape="pill"
+                  size="large"
+                  text="login_with"
+                  theme="outline"
+                  className="flex-1 bg-white hover:bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 flex items-center justify-center gap-2 transition-colors"
+                >
+                  <span className="text-sm font-medium text-gray-700">
+                    Google
+                  </span>
+                </GoogleLogin>
               </div>
             </div>
           </div>
         </div>
       </div>
-      {showforget && (
-        <ForgetPass onClose={() => setShowforget(false)} />
-      )}
+      
+      {/* ForgetPass Popup */}
+      <ForgetPass isOpen={showforget} onClose={() => setShowforget(false)} />
     </div>
-    
   );
 }
