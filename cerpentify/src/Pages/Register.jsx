@@ -119,9 +119,6 @@ export default function Register() {
               >
                 Sudah Punya Akun?
               </button>
-              <button className="bg-white hover:bg-gray-50 text-purple-600 px-8 py-3 rounded-full font-medium border-2 border-purple-200 transition-colors">
-                Lupa Sandi?
-              </button>
             </div>
           </div>
           

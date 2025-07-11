@@ -189,13 +189,6 @@ export default function Login() {
                     </label>
                   </div>
                   <div className="text-sm">
-                    <button 
-                      type="button"
-                      onClick={toggleForget} 
-                      className="text-purple-600 hover:text-purple-500 bg-transparent border-none cursor-pointer"
-                    >
-                      Lupa password?
-                    </button>
                   </div>
                 </div>
                 
