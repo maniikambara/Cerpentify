@@ -33,31 +33,31 @@ export const AuthProvider = ({ children }) => {
 
   // Register function
     const signup = async (email, password, username) => {
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-    
-      // Update user profile with username
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Update user profile with username
         await updateProfile(user, {
-        displayName: username
-    });
+            displayName: username
+        });
 
-      // Save user data to Firestore
-    await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
-        email: email,
-        username: username,
-        fullName: username,
-        age: 18,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    });
+        // Save user data to Firestore tanpa 'fullName' dan menambahkan liked_cn dan cerpenku sebagai array kosong
+        await setDoc(doc(db, 'users', user.uid), {
+            uid: user.uid,
+            email: email,
+            username: username,
+            liked_cn: [], // array kosong
+            cerpenku: [], // array kosong
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        });
 
-        return user;
-    } catch (error) {
-        throw error;
-    }
-};
+            return user;
+        } catch (error) {
+            throw error;
+        }
+    };
 
   // Login function
     const login = (email, password) => {

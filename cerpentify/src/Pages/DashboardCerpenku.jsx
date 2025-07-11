@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
-import BackgroundBlue from "../Component/Backgroundblue.jsx";
+import BackgroundPattern from "../Component/Background.jsx";
 import Navbar from "../Component/Navbar.jsx";
-import FloatButton from "../Component/FloatingAdd.jsx";
 import CardWhite from "../Component/Whitecard.jsx";
-import { db } from "../Firebase/firebase"; // Import db dari file firebase.js
+import FloatButton from "../Component/FloatingAdd.jsx";
+import { db } from "../Firebase/firebase.js";
 import { collection, getDocs } from "firebase/firestore";
-import { useAuth } from "../Firebase/authContext";
-import { doc, getDoc, query, where  } from "firebase/firestore";
+import { query, where } from "firebase/firestore";
+import { useLocation } from "react-router-dom";
+import { useAuth } from "../Firebase/authContext.jsx";
+import { doc, getDoc  } from "firebase/firestore";
 
 
-
-export default function Koleksi() {
+export default function Cerpenku() {
 const { currentUser } = useAuth();
 const [cerpenList, setCerpenList] = useState([]);
 const [filteredCerpen, setFilteredCerpen] = useState([]);
@@ -26,7 +27,7 @@ const fetchCerpenData = async () => {
     // Ambil liked_cn dari dokumen user
     const userRef = doc(db, "users", currentUser.uid);
     const userSnap = await getDoc(userRef);
-    const likedCn = userSnap.exists() ? userSnap.data().liked_cn || [] : [];
+    const likedCn = userSnap.exists() ? userSnap.data().cerpenku || [] : [];
 
     // Ambil semua cerpen
     const cerpenCollection = collection(db, "cerpen");
@@ -99,30 +100,14 @@ useEffect(() => {
   handleSearch(searchTerm, selectedCategory);
 }, [searchTerm, selectedCategory, cerpenList]);
 
-
   return (
     <div style={{ position: "relative", width: "100vw", height: "100vh" }}>
+      <Navbar onSearch={handleSearch} />
       <div className="fixed">
-        <BackgroundBlue />
+        <BackgroundPattern />
       </div>
       <div
         style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          zIndex: 100,
-        }}
-      >
-        <Navbar onSearch={handleSearch} />
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: "50px",
           position: "absolute",
           top: "5%",
           left: "50%",
@@ -136,14 +121,14 @@ useEffect(() => {
           boxSizing: "border-box",
         }}
       >
-        {/* Render Cerpen Data */}
+        {/* Render Cerpen berdasarkan hasil pencarian */}
         {[...Array(4)].map((_, rowIdx) => (
           <div
             key={rowIdx}
             style={{
               display: "flex",
-              justifyContent: "center", // Untuk menyejajarkan kartu di tengah
-              alignItems: "center", // Untuk menyejajarkan kartu secara vertikal
+              justifyContent: "center",
+              alignItems: "center",
               gap: "50px",
               width: "100%",
             }}
@@ -165,7 +150,7 @@ useEffect(() => {
       {/* Floating Action Button */}
       <div className="relative min-h-screen">
         <FloatButton />
-        </div>
+      </div>
     </div>
   );
 }

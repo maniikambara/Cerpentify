@@ -1,8 +1,20 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 import { useState, useRef, useEffect } from 'react';
 import BackgroundBlue from "../Component/Backgroundblue.jsx";
 import Navbar from "../Component/Navbar.jsx";
 import FloatButton from "../Component/FloatingAdd.jsx";
+import { db } from "../Firebase/firebase";
+import { useAuth } from '../Firebase/authContext';
+import { doc, getDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc } from "firebase/firestore";
+import { useParams } from 'react-router-dom';
+import { Timestamp } from "firebase/firestore";
+import { query, where } from "firebase/firestore";
+import { updateDoc, doc as firestoreDoc, arrayUnion } from "firebase/firestore";
+
+
+
 
 
 export const Cerpen = () => {
@@ -10,6 +22,104 @@ export const Cerpen = () => {
     const textareaRef = useRef(null);
     const [rating, setRating] = useState(0);
     const [hovered, setHovered] = useState(0);
+    const [reviews, setReviews] = useState([]);
+    const [jumlahUlasan, setJumlahUlasan] = useState(0);
+    const { currentUser, userProfile } = useAuth();
+
+    const { id } = useParams(); 
+    const [cerpen, setCerpen] = useState(null);
+
+    const fetchReviewsByCerpenId = async (cerpenId) => {
+    try {
+        const reviewQuery = query(
+        collection(db, "ulasan"),
+        where("cerpenID", "==", cerpenId)
+        );
+        const reviewSnapshot = await getDocs(reviewQuery);
+        setJumlahUlasan(reviewSnapshot.size);
+        const reviewData = reviewSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data()
+        }));
+        setReviews(reviewData);
+    } catch (error) {
+        console.error("Gagal mengambil ulasan:", error);
+    }
+    };
+        useEffect(() => {
+        const fetchCerpenById = async () => {
+        try {
+            const cerpenRef = doc(db, "cerpen", id);
+            const cerpenSnap = await getDoc(cerpenRef);
+            if (cerpenSnap.exists()) {
+            const data = cerpenSnap.data();
+            const scraped_at = data.scraped_at?.toDate();
+
+            setCerpen({ id: cerpenSnap.id, tanggal: scraped_at?.toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "long",
+          year: "numeric"
+        }) || "Tanggal tidak tersedia", ...cerpenSnap.data() });
+            } else {
+            console.log("Cerpen tidak ditemukan");
+            }
+            fetchReviewsByCerpenId(cerpenSnap.id);
+            
+        } catch (error) {
+            console.error("Gagal mengambil cerpen:", error);
+            }
+        };
+
+        fetchCerpenById();
+    }, [id]);
+
+
+    const handleUploadUlasan = async () => {
+        if (!text.trim()) return; // validasi kosong
+        if (!currentUser) {
+            alert("Kamu harus login untuk memberi ulasan.");
+            return;
+        }
+
+        try {
+            const newUlasan = {
+            cerpenID: cerpen.id,               // id cerpen dari halaman yang sedang dibuka
+            konten_komen: text.trim(),
+            userID: currentUser.uid,
+            username_ulas: userProfile?.username || "Anonim",           // dari auth
+            };
+            await addDoc(collection(db, "ulasan"), newUlasan);
+
+            // Kosongkan textarea
+            setText("");
+
+            // Refresh list ulasan (kalau perlu panggil fetchReviewsByCerpenId)
+            fetchReviewsByCerpenId(cerpen.id);
+
+        } catch (error) {
+            console.error("Gagal upload ulasan:", error);
+            alert("Terjadi kesalahan saat mengupload ulasan.");
+        }
+        };
+
+        const handleAddToCollection = async () => {
+            if (!currentUser) {
+                alert("Kamu harus login untuk menambahkan ke koleksi.");
+                return;
+            }
+
+            try {
+                const userRef = firestoreDoc(db, "users", currentUser.uid);
+                await updateDoc(userRef, {
+                liked_cn: arrayUnion(cerpen.id),
+                });
+                alert("Berhasil ditambahkan ke koleksimu!");
+            } catch (error) {
+                console.error("Gagal menambahkan ke koleksi:", error);
+                alert("Terjadi kesalahan saat menambahkan ke koleksi.");
+            }
+            };
+
   
     // Adjust height automatically
     useEffect(() => {
@@ -19,6 +129,10 @@ export const Cerpen = () => {
                 textarea.style.height = `${textarea.scrollHeight}px`; // Set to content height
             }
         }, [text]);
+
+        if (!cerpen) {
+    return <p className="text-center mt-20">Memuat cerpen...</p>;
+        }
 
     
 
@@ -33,47 +147,27 @@ export const Cerpen = () => {
                 <div class="w-270 bg-white rounded-xl py-8 px-50 shadow-md">
                     <h1 
                     class="text-5xl w-full font-bold p-3 pb-5 rounded-lg mb-4"
-                    >Kancil dan Buaya</h1>
+                    >{cerpen.title}</h1>
+
                     <div className="flex flex-wrap gap-2 pb-4">
                         <span
                             className="flex bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm"
                             >
-                                Horror
+                                {cerpen.category}
                         </span>
-                        <span
-                            className="flex bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm"
-                            >
-                                Romantis
-                        </span>
-                        <span
-                            className="flex bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm"
-                            >
-                                Drama
-                        </span>
+                       
                     </div>
-                    <p className="text-indigo-700 pl-3 pb-5">Penulis: Manik Ambarawan | Tanggal Upload: 17 Agustus 1945</p>
+                    <p className="text-indigo-700 pl-3 pb-5">Penulis: {cerpen.author} | Tanggal Upload: {cerpen.tanggal}</p>
+                    <button
+                        onClick={handleAddToCollection}
+                        className="bg-[#857EE6] text-white px-6 py-2 mb-6 rounded-full shadow-md hover:bg-[#6f66d0] transition"
+                        >
+                        Masukkan ke Koleksiku
+                    </button>
                 <p
                   class="w-full min-h-60 p-4 border border-gray-200 rounded-lg shadow-md resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300 placeholder-gray-400 mb-6" 
                   
-                >Suatu hari yang biasa; siang terang dan wanita berwajah penyok tengah keliling kampung sendiri saat anak-anak kecil sepulang sekolah itu mulai mengekori dan menyambut punggungnya di belakang.
-
-                Maka, wanita berwajah penyok mengambil sebongkah batu. Tangannya yang dekil melemparkan batu itu ke arah anak-anak. Seorang anak bengal berkepala peyang terkena timpukannya. Membuat jidatnya terluka. Darah segar mengucur dari situ, mengubah seragam putihnya menjadi merah. Dia pulang ke rumah mengadu kepada ibunya, sementara anak-anak lain menjadi takut dan bubar satu-satu.
-
-                Dengan terpaksa, keluarga wanita berwajah penyok akhirnya memutuskan untuk memasung dirinya pada sebuah ruangan kecil yang tak bisa disebut manusiawi dekat tanah pekuburan. Sejak itu wanita berwajah penyok tinggal di dalamnya. Bulan berganti tahun, tanpa tahu itu malam atau siang.
-
-                Seperti apakah rasanya hidup dalam sepi? Tanyakan pertanyaan ini kepadanya. Maka, yakinlah jika dia bisa berkata-kata, dia akan melancarkan jawabannya. Tak ada yang benar benar tahu apa yang dia kerjakan di dalam sana walau kadang terdengar suaranya berteriak untuk berontak. Ini hanya menambah ngeri tanah pekuburan.
-
-                Orang-orang mengira itu suara kuntilanak jejadian penghuni kuburan. Tak pernah ada orang yang benar-benar mendekat. Wanita berwajah penyok telah lupa bahasa tanpa ia pernah benar-benar menguasainya.
-
-                Andaikata suatu saat dia bisa terbebas dari pasungnya, orang akan bertanya bagaimana ia bisa bertahan hidup? Sebab ia telah menjadi sendiri.
-
-                Pada malam yang biasanya kelam nan pekat, kini wanita berwajah penyok bisa mendapat segaris cahaya dari celah lubang tadi. Kepalanya didongakkan ke atas, dia bisa melihat rembulan. Bertahun dia tidak melihat rembulan hingga ia lupa bahwa yang dilihatnya adalah rembulan.
-
-                Untuk pertama kalinya dalam periode tahunan pasungnya, ia merasa bahwa dirinya punya teman. Dia mulai berkenalan. Dengan bahasa yang hanya ia mengerti, ia bercakap-cakap dengan bulan. Dia selalu menunggu teman barunya untuk berkunjung dan bercakap-cakap dengannya setiap malam.
-
-                Namun, semakin hari bentuk wajah rembulan semakin sempit dan cekung. Mengecil dan terus mengecil hingga hanya menjadi sabit. Air muka rembulan juga semakin pasi.
-
-                Semakin hari sabit rembulan jadi kembali membulat walaupun wajahnya masih pasi. Saat bulan bulat penuh, wanita berwajah penyok girang sekali sebab ini berarti dirinya berhasil menghibur teman baiknya. Tapi suatu hari rembulan kembali menyabit dan seperti yang sudah-sudah, wanita berwajah penyok tak pernah bosan menghiburnya dengan bahasanya sendiri hingga rembulan bulat penuh. Terus seperti itu.</p>
+                >{cerpen.content}</p>
           </div>
         </div>
         <section className="w-270 mx-auto px-4 py-1">
@@ -92,33 +186,34 @@ export const Cerpen = () => {
                     {/* Tombol hanya muncul jika sedang mengetik */}
                     {text.trim() !== "" && (
                         <div className="flex justify-end mt-4">
-                        <button className="bg-[#857EE6] text-white px-6 py-2 rounded-full shadow-md hover:bg-[#6f66d0] transition">
+                        <button onClick={handleUploadUlasan} className="bg-[#857EE6] text-white px-6 py-2 rounded-full shadow-md hover:bg-[#6f66d0] transition">
                             Upload Ulasan
                         </button>
                         </div>
                     )}
                     </div>
             <div className=" bg-white rounded-2xl shadow-md p-10 space-y-8 px-40">
-                <p className="text-gray-400">1000 Review</p>
-                {[  
-                { name: "Manik", comment: "Jelek banget Babi" },
-                { name: "Bangsat", comment: "Hidden talent, keep it hidden 11111" },
-                { name: "Bangsat", comment: "hapus aj" }
-                ].map((review, index) => (
-                <div class="w-full bg-white rounded-xl border-2 border-indigo-300 py-4 px-8 shadow-lg">
-                <div key={index} className="divide-x divide-indigo-400 w-270 flex items-start gap-4">
-                    {/* Kolom Kiri: Rating dan Nama */}
-                    <div className="flex flex-col pr-15 items-left min-w-[80px]">
+                <p className="text-gray-400">{jumlahUlasan} ulasan</p>
+                {reviews.length > 0 ? (
+                reviews.map((ulasan, index) => (
+                    <div key={ulasan.id || index} className="w-full bg-white rounded-xl border-2 border-indigo-300 py-4 px-8 shadow-lg">
+                    <div className="divide-x divide-indigo-400 w-270 flex items-start gap-4">
+                        {/* Kolom Kiri: Rating dan Nama */}
+                        <div className="flex flex-col pr-15 items-left min-w-[80px]">
                         <p className="text-sm text-gray-600 mt-1">oleh </p>
-                        <p className="text-lg text-gray-600 mt-1">{review.name}</p>
+                        <p className="text-lg text-gray-600 mt-1">{ulasan.username_ulas}</p>
+                        </div>
+                        {/* Kolom Kanan: Komentar */}
+                        <div className="flex-1 pl-4">
+                        <p className="text-base text-gray-700 leading-relaxed">"{ulasan.konten_komen}"</p>
+                        </div>
                     </div>
-                    {/* Kolom Kanan: Komentar */}
-                    <div className="flex-1">
-                    <p className="text-base text-gray-700 leading-relaxed">"{review.comment}"</p>
                     </div>
-                </div>
-                </div>
-                ))}
+                ))
+                ) : (
+                <p className="text-center text-gray-500">Belum ada ulasan.</p>
+                )}
+
             </div>
         </section>
 
