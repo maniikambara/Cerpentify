@@ -53,7 +53,15 @@ export const Cerpen = () => {
             const cerpenSnap = await getDoc(cerpenRef);
             if (cerpenSnap.exists()) {
             const data = cerpenSnap.data();
-            const scraped_at = data.scraped_at?.toDate();
+            let scraped_at;
+
+if (data.scraped_at && typeof data.scraped_at.toDate === "function") {
+  scraped_at = data.scraped_at.toDate();
+} else if (typeof data.scraped_at === "string" || typeof data.scraped_at === "number") {
+  scraped_at = new Date(data.scraped_at);
+} else {
+  scraped_at = null;
+}
 
             setCerpen({ id: cerpenSnap.id, tanggal: scraped_at?.toLocaleDateString("id-ID", {
           day: "numeric",

@@ -1,15 +1,19 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const getShortContent = (text, minWords = 10, maxWords = 20) => {
-  const cleanText = text.replace(/[^\w\s]/g, "");
-  const words = cleanText.split(" ");
+const getShortContent = (text, maxChars = 120) => {
+  if (!text) return "";
 
-  if (words.length <= maxWords) {
-    return text; 
+  // Hilangkan karakter spesial jika perlu
+  const cleanText = text.replace(/[^\w\s.,!?'"()\-]/g, "");
+
+  // Jika teks lebih pendek dari batas, tampilkan apa adanya
+  if (cleanText.length <= maxChars) {
+    return cleanText;
   }
 
-  return words.slice(0, Math.max(minWords, maxWords)).join(" ") + "...";  
+  // Potong hingga batas karakter, lalu tambahkan "..."
+  return cleanText.slice(0, maxChars).trim() + "...";
 };
 
 const getShortTitle = (title, minWords = 2, maxWords = 3) => {
@@ -55,7 +59,7 @@ export default function CardWhite({ id, title, author, content, category, jumlah
       <p className="text-sm text-indigo-700">{getShortTitle(category)}</p>
 
       {/* Deskripsi */}
-      <p className="text-sm pt-2 mb-13 text-gray-600 leading-relaxed break-word word-break overflow-wrap text-ellipsis h-24">{getShortContent(content)}</p> {/* Menampilkan konten yang sudah dipotong */}
+      <p className="text-sm pt-2 mb-10 text-gray-600 leading-relaxed break-word word-break overflow-hidden text-ellipsis h-24">{getShortContent(content)}</p> {/* Menampilkan konten yang sudah dipotong */}
 
       {/* Rating */}
       <span className="text-sm  text-purple-600 border border-purple-300 px-3 py-1 rounded-full">
@@ -63,7 +67,7 @@ export default function CardWhite({ id, title, author, content, category, jumlah
       </span>
 
       {/* Penulis */}
-      <div className="flex items-center space-x-3 pt-2">
+      <div className="flex items-center pt-4 space-x-3">
         <div className="bg-gray-100 p-2 rounded-full">
           <svg
             className="w-6 h-6 text-gray-500"
