@@ -49,7 +49,7 @@ const Navbar = ({ onSearch }) => {
   };
 
   // Mengecek apakah kita sedang berada di halaman Dashboard atau Koleksi
-  const isDashboardOrKoleksiPage = location.pathname === "/dashboard" || location.pathname === "/koleksi";
+  const isDashboardOrKoleksiPage = location.pathname === "/dashboard" || location.pathname === "/koleksi" || location.pathname === "/cerpenku" ;
 
   return (
     <>
@@ -80,7 +80,7 @@ const Navbar = ({ onSearch }) => {
             Kontak
           </a>
           <a
-            href="#myStories"
+            href="/cerpenku"
             className="text-gray-800 text-lg font-medium hover:text-blue-500 transition duration-300 ease-in-out transform hover:scale-105"
           >
             Cerpenku
