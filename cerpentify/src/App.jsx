@@ -23,7 +23,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/kontak" element={<Contact />} />
-          <Route path="/kontak" element={<Contact />} />
+          <Route path="/kontakbefore" element={<ContactPageBefore />} />
           <Route path="/tambah" element={<TambahCerpen />} />
           <Route path="/cerpenku" element={<Cerpenku />} />
           <Route path="/cerpen/:id" element={<Cerpen />} /> {/* Dynamic Route for cerpen details */}
